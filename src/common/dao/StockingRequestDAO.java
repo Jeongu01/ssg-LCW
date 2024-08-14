@@ -120,6 +120,7 @@ public class StockingRequestDAO {
     this.connection = conncp.getConnection(100);
 
     PreparedStatement pstmt = connection.prepareStatement(query);
+    pstmt.setString(1,userId);
     this.rs = pstmt.executeQuery();
 
     conncp.releaseConnection(this.connection);
