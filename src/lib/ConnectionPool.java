@@ -26,7 +26,10 @@ public class ConnectionPool {
     //싱글턴,멀티 환경인 경우 syn키워드로 한놈씩 접근하게 해야댐
     public static synchronized ConnectionPool getInstance(){
         if(instance == null){
-            instance = new ConnectionPool("","","",5);
+            instance = new ConnectionPool("jdbc:mysql://localhost:3306/lcwmsdb?characterEncoding=UTF-8&serverTimezone=UTC",
+                    "root",
+                    "1234",
+                    5);
         }
         return instance;
     }
