@@ -2,8 +2,10 @@ package service.impl;
 
 import common.dao.WarehouseManagementDAO;
 import service.WMServiceGM;
+import vo.UserVO;
 import vo.WarehouseVO;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class WarehouseManagementImpl implements WMServiceGM {
@@ -24,23 +26,24 @@ public class WarehouseManagementImpl implements WMServiceGM {
     }
 
     @Override
-    public ArrayList<WarehouseVO> inquiryAllWarehouse() {  // 모든 창고 조회
+    public ArrayList<WarehouseVO> inquiryAllWarehouse() throws SQLException, InterruptedException {  // 모든 창고 조회
         return dao.selectAllWarehouse();
     }
 
     @Override
-    public ArrayList<WarehouseVO> warehouseInquiryById() { // 자기의 창고 조회->싱글턴 유저가 있겟다.
-        return dao.selectWarehouse("");
+    public ArrayList<WarehouseVO> warehouseInquiryById() { // 자기의 창고 조회..싱글턴 유저가 있겟다.
+        UserVO user = new UserVO();
+        return dao.selectWarehouseById(user.getUserId());
     }
 
     @Override
     public ArrayList<WarehouseVO> warehouseInquiryByLocation(String location){
-        return dao.selectWarehouse("");
+        return dao.selectWarehouseByLocation(location);
     }
 
     @Override
     public ArrayList<WarehouseVO> warehouseInquiryByName(String name){
-        return dao.selectWarehouse("");
+        return dao.selectWarehouseByName(name);
     }
 
 }
