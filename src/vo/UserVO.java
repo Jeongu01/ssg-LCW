@@ -1,13 +1,16 @@
 package vo;
 
 import java.util.Date;
-import lombok.AllArgsConstructor;
+
 import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import util.Role;
 import util.UserStatus;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class UserVO {
 
   private String userId;

@@ -12,5 +12,5 @@ public class WarehouseVO {
     private String addressDetail;
     private int zipCode;
     private int storageArea;
-    private int managerId;
+    private String managerId;
 }
