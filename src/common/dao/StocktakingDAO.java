@@ -1,4 +1,4 @@
-package service;
+package common.dao;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -7,8 +7,6 @@ import lib.ConnectionPool;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.*;
-import lib.ObjectDBIO;
-import vo.ProductVO;
 import vo.StockVO;
 
 public class StocktakingDAO {
@@ -98,7 +96,7 @@ public class StocktakingDAO {
 
       conncp.releaseConnection(this.connection);
 
-      while(rs.next())
+      while(rs.next()) {
 
         stock = new StockVO(
             rs.getString("user_id"),
@@ -106,7 +104,8 @@ public class StocktakingDAO {
             rs.getInt("product_id"),
             rs.getInt("quantity"));
 
-      stockList.add(stock);
+        stockList.add(stock);
+      }
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -187,10 +186,10 @@ public class StocktakingDAO {
     List<StockVO> stockList = new ArrayList<StockVO>();
     this.connection = conncp.getConnection(100);
     try {
-      sql = " select *, pd.productName from stock s "
+      sql = " s.user_id, s.storage_id, s.product_name, s.quantity, pd.productName from stock s "
           + " JOIN product pd ON s.productId = pd.productId  "
           + " JOIN storage st ON s.storage_id = st.storage_id "
-          + " where s.productId = ? OR p.productName like =?";
+          + " where s.productId = %?% OR p.productName like =%?%";
 
       pstmt = connection.prepareStatement(sql);
       pstmt.setString(1, input);
@@ -217,39 +216,39 @@ public class StocktakingDAO {
 
 
   //창고 현황 조회
-  public List<StockVO> warehouseStatus()  throws SQLException, InterruptedException{
+  public void warehouseStatus()  throws SQLException, InterruptedException{
 
     List<StockVO> stockList = new ArrayList<StockVO>();
     this.connection = conncp.getConnection(100);
     try {
-      sql = " select *, "
-          + " (select ) "
+      sql = " select s.storage_id, st.storage_name, format(storage_area, \"#,###,###\") as storage_area, "
+          + " format(sum(s.storage_quantity)*area_per_product, \"#,###,###\") as 창고사용량 "
+          + " , concat(round((sum(s.storage_quantity)*area_per_product / storage_area)*100,1),'%') as \'창고용적률\' "
           + " from stock s "
-          + " JOIN product pd ON s.productId = pd.productId  "
+          + " JOIN product pd ON s.product_Id = pd.product_Id "
           + " JOIN storage st ON s.storage_id = st.storage_id "
-          + " where s.productId = ? OR p.productName like =?";
+          + " group by s.product_id, s.storage_id";
 
       pstmt = connection.prepareStatement(sql);
-      pstmt.setString(1, input);
-      pstmt.setString(2, input);
+
       rs = pstmt.executeQuery();
 
       conncp.releaseConnection(this.connection);
 
-      while(rs.next())
-
+      //수정하기~~~~~~~
+      while(rs.next()) {
         stock = new StockVO(
             rs.getString("user_id"),
             rs.getInt("storage_id"),
             rs.getInt("product_id"),
             rs.getInt("quantity"));
 
-      stockList.add(stock);
-
+        stockList.add(stock);
+      }
     } catch (Exception e) {
       e.printStackTrace();
     }
-    return stockList;
+
   }
 
 

@@ -1,10 +1,12 @@
-package service;
+package service.impl;
 
 import java.util.List;
+import common.dao.StocktakingDAO;
+import service.StocktakingInterface;
 import vo.StockCountVO;
 import vo.StockVO;
 
-public class StocktakingImpl implements StocktakingInterface{
+public class StocktakingImpl implements StocktakingInterface {
 
   private StocktakingDAO dao = null;
 
