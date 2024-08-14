@@ -21,7 +21,7 @@ public class WarehouseManagementDAO {
     public ArrayList<WarehouseVO> selectAllWarehouse(){
         return null;
     }
-    public WarehouseVO selectWarehouse(){
+    public ArrayList<WarehouseVO> selectWarehouse(String where){
         return null;
     }
     public void insertWarehouse(WarehouseVO data){}

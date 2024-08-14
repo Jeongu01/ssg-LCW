@@ -2,6 +2,8 @@ package service;
 
 import vo.WarehouseVO;
 
+import java.util.ArrayList;
+
 public interface WMServiceWM {
-    public WarehouseVO inquiryWarehouse(WarehouseVO data);
+    public ArrayList<WarehouseVO> warehouseInquiryById();
 }

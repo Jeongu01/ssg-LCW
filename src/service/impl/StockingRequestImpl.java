@@ -6,8 +6,18 @@ import service.StockingRequestServiceManager;
 import service.StockingRequestServiceSupplier;
 import vo.StockingRequestVO;
 
-public class StockingRequestImpl implements StockingRequestServiceManager,
-    StockingRequestServiceSupplier {
+public class StockingRequestImpl implements StockingRequestServiceManager, StockingRequestServiceSupplier {
+
+  /*
+  1. 관리자 입고 메뉴
+  1) 입고 요청서 조회
+  2) 입고 요청 승인
+  3) 입고 처리
+
+  2. 회원 입고 메뉴
+  1) 입고 요청
+  2) 입고 요청서 조회
+  */
 
   StockingRequestDAO dao = null;
 
@@ -31,23 +41,12 @@ public class StockingRequestImpl implements StockingRequestServiceManager,
   }
 
   @Override
-  public void RequestWarehousing(StockingRequestVO data) {
+  public void requestWarehousing(StockingRequestVO data) {
 
   }
 
   @Override
   public ArrayList<StockingRequestVO> inquiryWarehouseRequests() {
-    return dao.selectinquiryWarehouseRequests();
+    return dao.selectInquiryWarehouseRequests();
   }
-
-  /*
-  1. 관리자 입고 메뉴
-  1) 입고 요청서 조회
-  2) 입고 요청 승인
-  3) 입고 처리
-
-  2. 회원 입고 메뉴
-  1) 입고 요청
-  2) 입고 요청서 조회
-  */
 }
