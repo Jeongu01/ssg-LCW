@@ -29,11 +29,18 @@ public class WarehouseManagementImpl implements WMServiceGM {
     }
 
     @Override
-    public WarehouseVO inquiryWarehouse() { // 자기의 창고 조회->싱글턴 유저가 있겟다.
-        return dao.selectWarehouse(/*user_id에 맞는 창고 id*/);
+    public ArrayList<WarehouseVO> warehouseInquiryById() { // 자기의 창고 조회->싱글턴 유저가 있겟다.
+        return dao.selectWarehouse("");
     }
 
-    private ArrayList<WarehouseVO> warehouseInquiryByLocation(){
-        return null;//구현전...
+    @Override
+    public ArrayList<WarehouseVO> warehouseInquiryByLocation(String location){
+        return dao.selectWarehouse("");
     }
+
+    @Override
+    public ArrayList<WarehouseVO> warehouseInquiryByName(String name){
+        return dao.selectWarehouse("");
+    }
+
 }
