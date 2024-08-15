@@ -9,7 +9,7 @@ import java.sql.Date;
 @AllArgsConstructor
 public class ContractVO {
     private int contractId;
-    private int userId;
+    private String userId;
     private int contractArea;
     private int contractCost;
     private Date contractDate;

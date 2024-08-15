@@ -34,17 +34,7 @@ public class ProductManagementImpl implements PMserviceGM {
     }
 
     @Override
-    public ArrayList<ProductVO> inquiryProductByCategory(String catecoryId) {
-        return dao.selectProduct(catecoryId);
-    }
-
-    @Override
     public ArrayList<ProductVO> inquiryProductByName(String name) {
-        return dao.selectProduct(name);
-    }
-
-    @Override
-    public ArrayList<ProductVO> inquiryProductByWarehouse(String wareId) {
-        return dao.selectProduct(wareId);
+        return dao.selectProductByName(name);
     }
 }
