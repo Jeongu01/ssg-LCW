@@ -1,5 +1,6 @@
 package common.dao;
 
+import java.io.IOException;
 import lib.ConnectionPool;
 import service.ReleaseServiceGM;
 import service.ReleaseServiceMember;
@@ -22,6 +23,7 @@ public class ReleaseDAO implements ReleaseServiceGM, ReleaseServiceMember {
     private ResultSet rs = null;
     private PreparedStatement pstmt = null;
     ReleaseVO releaseVO = null;
+    int requestId = 0;
 
     public ReleaseDAO(){
         this.conncp = ConnectionPool.getInstance();
@@ -29,9 +31,9 @@ public class ReleaseDAO implements ReleaseServiceGM, ReleaseServiceMember {
 
     public boolean requestRelease(ReleaseVO data) throws SQLException, InterruptedException { //출고요청
         String query = "INSERT INTO " +
-                "delivery_request(delivery_request_id, product_id, request_date, delivery_address, " +
-                "address_detail, request_quantity, request_comment) " +
-                "VALUES(NULL, ?, NOW(), ?, ?, ?, ?)";
+                " delivery_request(delivery_request_id, product_id, request_date, delivery_address, " +
+                " address_detail, request_quantity, request_comment) " +
+                " VALUES(NULL, ?, NOW(), ?, ?, ?, ?) ";
 
         boolean result1 = false;
 
@@ -59,36 +61,77 @@ public class ReleaseDAO implements ReleaseServiceGM, ReleaseServiceMember {
         return result1;
     }
 
-    public ResultSet approveReleaseRequest() throws SQLException, InterruptedException { //출고승인
-/*DELIMITER $$ -- 승인 및 운송장 자동 등록
-CREATE PROCEDURE releaseProc()
-BEGIN
-	INSERT INTO delivery_request(approved_date) VALUES(NOW())"; -- 승인(수정 필요)
-	INSERT INTO waybill(product_id, product_name, delivery_quantity, -- 운송장 등록
-						business_name, start_address, business_tel,
-						arrive_address, arrive_address_detail, request_comment)
-                SELECT  p.product_id, p.product_name, d.request_quantity,
-                        u.business_name, u.address, u.tel,
-                        d.delivery_address, d.address_detail, d.request_comment
-                        FROM delivery_request AS d, user AS u, stock AS s, product AS p
-                        WHERE d.user_id = u.user_id AND u.user_id = s.user_id AND s.product_id = p.product_id;
-END
-DELIMITER ;*/
+    public boolean approveReleaseRequest() throws SQLException, InterruptedException, IOException { //출고승인
 
+        String query = "UPDATE delivery_request dr "
+            + " JOIN stock s ON dr.product_id = s.product_id "
+            + " AND dr.user_id = s.user_id "
+            + " SET dr.approved_date = NOW() "
+            + " WHERE dr.delivery_request_id = ? "
+            + " AND dr.request_quantity <= s.storage_quantity ";
 
-        String query = "CALL releaseProc()";
+        boolean result1 = false;
+
+        System.out.print("승인할 출고번호를 입력해주세요 : ");
+        requestId = Integer.parseInt(br.readLine());
+
 
         this.connection = conncp.getConnection(100);
 
         try {
-            Statement stmt = connection.createStatement();
-            rs = stmt.executeQuery(query);
+            PreparedStatement pstmt = connection.prepareStatement(query);
+            pstmt.setInt(1, requestId);
+
+            int result = pstmt.executeUpdate();
+
+            if(result == 1) {
+                result1 = true;
+            } else if (result == 0) {
+                result1 = false;
+            }
+
+            pstmt.close();
+
         } catch (SQLException e) {
             System.err.println(e.getMessage());
         }
 
         conncp.releaseConnection(this.connection);
-        return rs;
+        return result1;
+    }
+
+    public boolean registerWaybill() throws SQLException { //운송장 등록(승인시 사용)
+        String query = "INSERT INTO waybill(product_id, product_name, delivery_quantity, "
+            + " business_name, start_address, business_tel, " //business_name하고 number는 null값 허용해야됨
+            + " arrive_address, arrive_address_detail, request_comment) "
+            + " SELECT  p.product_id, p.product_name, d.request_quantity, "
+            + " u.business_name, u.address, u.tel, "
+            + " d.delivery_address, d.address_detail, d.request_comment "
+            + " FROM delivery_request AS d, user AS u, stock AS s, product AS p "
+            + " WHERE d.user_id = u.user_id AND u.user_id = s.user_id AND s.product_id = p.product_id";
+
+        boolean result1 = false;
+
+        this.connection = conncp.getConnection(100);
+
+        try {
+            PreparedStatement pstmt = connection.prepareStatement(query);
+
+            int result = pstmt.executeUpdate();
+            pstmt.close();
+
+            if (result == 1) {
+                result1 = true;
+            } else if (result == 0) {
+                result1 = false;
+            }
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+
+        conncp.releaseConnection(this.connection);
+        return result1;
+
     }
 
 
@@ -117,11 +160,13 @@ DELIMITER ;*/
 
             notApprovedReleaseList.add(releaseVO);
         }
+        rs.close();
+        pstmt.close();
 
         return notApprovedReleaseList;
     }
 
-    public List<ReleaseVO> selectShippingReleaseAllList() { //출고지시서 리스트(전체 조회)
+    public List<ReleaseVO> selectShippingReleaseAllList() throws SQLException { //출고지시서 리스트(전체 조회)
         ArrayList<ReleaseVO> shippingReleaseList = new ArrayList<ReleaseVO>();
         String query = "SELECT delivery_request_id, user_id, " +
                 "DATE_FORMAT(request_date, '%Y-%m-%d'), " +
@@ -129,81 +174,269 @@ DELIMITER ;*/
                 "FROM delivery_request" +
                 "WHERE approved_date IS NOT NULL";
 
+        this.connection = conncp.getConnection(100);
+
+        pstmt = connection.prepareStatement(query);
+        //pstmt.setInt(1, waybillId);
+
+        rs = pstmt.executeQuery();
+        conncp.releaseConnection(this.connection);
+
+        while(rs.next()){
+            releaseVO = new ReleaseVO(
+                rs.getInt(1),
+                rs.getString(2),
+                rs.getDate(3),
+                rs.getDate(4)
+            );
+            shippingReleaseList.add(releaseVO);
+        }
+        rs.close();
+        pstmt.close();
+
         return shippingReleaseList;
     }
 
-    public List<ReleaseVO> selectShippingReleaseYearList() { //출고지시서 리스트(년도별 검색)
+    public List<ReleaseVO> selectShippingReleaseYearList() throws SQLException, IOException { //출고지시서 리스트(년도별 검색)
         ArrayList<ReleaseVO> shippingReleaseYearList = new ArrayList<ReleaseVO>();
         String query = "SELECT delivery_request_id, user_id, " +
-                "DATE_FORMAT(request_date, '%Y-%m-%d'), " +
-                "user_id, DATE_FORMAT(approved_date, '%Y-%m-%d') " +
-                "FROM delivery_request" +
-                "approved_date IS NOT NULL AND" +
-                "WHERE approved_date BETWEEN '?-01-01' and '?-12-31'";
+                " DATE_FORMAT(request_date, '%Y-%m-%d'), " +
+                " DATE_FORMAT(approved_date, '%Y-%m-%d') " +
+                " FROM delivery_request" +
+                " approved_date IS NOT NULL AND" +
+                " WHERE approved_date BETWEEN '?-01-01' and '?-12-31'";
+
+        System.out.print("시작 연도 : ");
+        int startYear = Integer.parseInt(br.readLine());
+        System.out.print("끝 연도 : ");
+        int endYear = Integer.parseInt(br.readLine());
+
+        this.connection = conncp.getConnection(100);
+
+        pstmt = connection.prepareStatement(query);
+        pstmt.setInt(1,startYear);
+        pstmt.setInt(2,endYear);
+
+        rs = pstmt.executeQuery();
+        conncp.releaseConnection(this.connection);
+
+        while(rs.next()){
+            ReleaseVO releaseVO = new ReleaseVO(
+                rs.getInt(1),
+                rs.getString(2),
+                rs.getDate(3),
+                rs.getDate(4)
+
+                );
+            shippingReleaseYearList.add(releaseVO);
+        }
+
+        rs.close();
+        pstmt.close();
 
         return shippingReleaseYearList;
     }
 
-    public List<ReleaseVO> selectShippingReleaseMonthList() { //출고지시서 리스트(월별 검색)
+    public List<ReleaseVO> selectShippingReleaseMonthList() throws IOException, SQLException { //출고지시서 리스트(월별 검색)
         ArrayList<ReleaseVO> shippingReleaseMonthList = new ArrayList<ReleaseVO>();
-        String query = "SELECT delivery_request_id, user_id AS '요청 아이디', " +
-                "DATE_FORMAT(request_date, '%Y-%m-%d'), " +
-                "user_id AS '승인자ID', DATE_FORMAT(approved_date, '%Y-%m-%d') " +
-                "FROM delivery_request" +
-                "approved_date IS NOT NULL AND" +
-                "WHERE approved_date BETWEEN '?-?-01' and '?-?-31'";
+        String query = "SELECT delivery_request_id, user_id, " +
+                " DATE_FORMAT(request_date, '%Y-%m-%d'), " +
+                " DATE_FORMAT(approved_date, '%Y-%m-%d') " +
+                " FROM delivery_request" +
+                " approved_date IS NOT NULL AND" +
+                " WHERE approved_date BETWEEN '?-01' and '?-31'";
+
+        System.out.print("시작 년-월 ('-'를 사용하여 입력해주세요) : ");
+        int startYM = Integer.parseInt(br.readLine());
+        System.out.print("끝 년-월 ('-'를 사용하여 입력해주세요) : ");
+        int endYM = Integer.parseInt(br.readLine());
+
+        this.connection = conncp.getConnection(100);
+
+        pstmt = connection.prepareStatement(query);
+        pstmt.setInt(1,startYM);
+        pstmt.setInt(2,endYM);
+
+
+        rs = pstmt.executeQuery();
+        conncp.releaseConnection(this.connection);
+
+        while(rs.next()){
+            ReleaseVO releaseVO = new ReleaseVO(
+                rs.getInt(1),
+                rs.getString(2),
+                rs.getDate(3),
+                rs.getDate(4)
+
+            );
+            shippingReleaseMonthList.add(releaseVO);
+        }
+
+        rs.close();
+        pstmt.close();
 
         return shippingReleaseMonthList;
     }
 
-    public List<ReleaseVO> selectShippingReleaseDayList() { //출고지시서 리스트(일별 검색)
+    public List<ReleaseVO> selectShippingReleaseDayList() throws IOException, SQLException { //출고지시서 리스트(일별 검색)
         ArrayList<ReleaseVO> shippingReleaseDayList = new ArrayList<ReleaseVO>();
-        String query = "SELECT delivery_request_id, user_id AS '요청 아이디', " +
-                "DATE_FORMAT(request_date, '%Y-%m-%d'), " +
-                "DATE_FORMAT(approved_date, '%Y-%m-%d') " +
-                "FROM delivery_request" +
-                "approved_date IS NOT NULL AND" +
-                "WHERE approved_date BETWEEN '?-?-?' and '?-?-?'";
+        String query = "SELECT delivery_request_id, user_id, " +
+                " DATE_FORMAT(request_date, '%Y-%m-%d'), " +
+                " DATE_FORMAT(approved_date, '%Y-%m-%d') " +
+                " FROM delivery_request" +
+                " approved_date IS NOT NULL AND" +
+                " WHERE approved_date BETWEEN '?' and '?'";
+
+        System.out.print("시작 년-월-일 ('-'를 사용하여 입력해주세요) : ");
+        int startYMD = Integer.parseInt(br.readLine());
+        System.out.print("끝 년-월-일 ('-'를 사용하여 입력해주세요) : ");
+        int endYMD = Integer.parseInt(br.readLine());
+
+        this.connection = conncp.getConnection(100);
+
+        pstmt = connection.prepareStatement(query);
+        pstmt.setInt(1,startYMD);
+        pstmt.setInt(2,endYMD);
+
+
+        rs = pstmt.executeQuery();
+        conncp.releaseConnection(this.connection);
+
+        while(rs.next()){
+            ReleaseVO releaseVO = new ReleaseVO(
+                rs.getInt(1),
+                rs.getString(2),
+                rs.getDate(3),
+                rs.getDate(4)
+
+            );
+            shippingReleaseDayList.add(releaseVO);
+        }
+
+        rs.close();
+        pstmt.close();
 
         return shippingReleaseDayList;
     }
 
-    public List<ReleaseVO> selectShippingReleaseDetail() { //출고지시서 상세보기(조회)
+    public List<ReleaseVO> selectShippingReleaseDetail() throws SQLException { //출고지시서 상세보기(조회)
         ArrayList<ReleaseVO> shippingReleaseDetail = new ArrayList<ReleaseVO>();
-        String query = "SELECT d.delivery_request_id, user_id AS '요청 아이디', " +
-                "DATE_FORMAT(request_date, '%Y-%m-%d'), " +
-                "DATE_FORMAT(approved_date, '%Y-%m-%d'), " +
-                "p.product_id, p.product_name, d.request_quantity, " +
-                "d.delivery_address, d.address_detail " +
-                "c.car_number, c.car_type" +
-                "FROM delivery_request AS d, user AS u, stock AS s, product AS p, dispatch AS dis, car AS c" +
-                "WHERE d.user_id = u.user_id AND u.user_id = s.user_id AND s.product_id = p.product_id AND " +
-                "d.delivery_request_id = dis.delivery_request_id AND dis.car_number = c.car_number AND " +
-                "delivery_request_id = ?";
+        String query = "SELECT d.delivery_request_id, user_id " +
+                " DATE_FORMAT(request_date, '%Y-%m-%d'), " +
+                " DATE_FORMAT(approved_date, '%Y-%m-%d'), " +
+                " p.product_id, p.product_name, d.request_quantity, " +
+                " d.delivery_address, d.address_detail " +
+                " c.car_number, c.car_type " +
+                " FROM delivery_request AS d, user AS u, stock AS s, product AS p, dispatch AS dis, car AS c " +
+                " WHERE d.user_id = u.user_id AND u.user_id = s.user_id AND s.product_id = p.product_id AND " +
+                " d.delivery_request_id = dis.delivery_request_id AND dis.car_number = c.car_number AND " +
+                " d.delivery_request_id = ? ";
+
+        this.connection = conncp.getConnection(100);
+
+        pstmt = connection.prepareStatement(query);
+
+        rs = pstmt.executeQuery();
+        conncp.releaseConnection(this.connection);
+
+        while(rs.next()){
+            ReleaseVO releaseVO = new ReleaseVO(
+                rs.getInt(1),
+                rs.getString(2),
+                rs.getDate(3),
+                rs.getDate(4),
+                rs.getInt(5),
+                rs.getString(6),
+                rs.getInt(7),
+                rs.getString(8),
+                rs.getString(9),
+                rs.getString(10),
+                rs.getString(11)
+                );
+            shippingReleaseDetail.add(releaseVO);
+        }
+
+        pstmt.close();
 
         return shippingReleaseDetail;
     }
 
-    public List<ReleaseVO> selectProductsReleaseNameList() { //출고 상품 리스트(이름으로 검색)
+    public List<ReleaseVO> selectProductsReleaseNameList() throws SQLException, IOException { //출고 상품 리스트(이름으로 검색)
         ArrayList<ReleaseVO> productsReleaseList = new ArrayList<ReleaseVO>();
-        String query = "SELECT p.product_id, p.product_name, p.product_brand," +
-                "d.request_quantity, DATE_FORMAT(request_date, '%Y-%m-%d'), " +
-                "DATE_FORMAT(approved_date, '%Y-%m-%d') " +
-                "FROM delivery_request AS d, user AS u, stock AS s, product AS p" +
-                "WHERE d.user_id = u.user_id AND u.user_id = s.user_id AND s.product_id = p.product_id" +
-                "d.approved_date IS NOT NULL AND p.product_name like '%?%'";
+        String query = "SELECT d.delivery_request_id, p.product_id, p.product_name, p.product_brand," +
+                " d.request_quantity, DATE_FORMAT(request_date, '%Y-%m-%d'), " +
+                " DATE_FORMAT(approved_date, '%Y-%m-%d') " +
+                " FROM delivery_request AS d, user AS u, stock AS s, product AS p" +
+                " WHERE d.user_id = u.user_id AND u.user_id = s.user_id AND s.product_id = p.product_id" +
+                " d.approved_date IS NOT NULL AND p.product_name like '%?%'";
+
+        System.out.print("상품이름 검색 : ");
+        int productName = Integer.parseInt(br.readLine());
+
+        this.connection = conncp.getConnection(100);
+
+        pstmt = connection.prepareStatement(query);
+        pstmt.setInt(1,productName);
+
+
+        rs = pstmt.executeQuery();
+        conncp.releaseConnection(this.connection);
+
+        while(rs.next()){
+            ReleaseVO releaseVO = new ReleaseVO(
+                rs.getInt(1),
+                rs.getInt(2),
+                rs.getString(3),
+                rs.getString(4),
+                rs.getInt(5),
+                rs.getDate(6),
+                rs.getDate(7)
+            );
+            productsReleaseList.add(releaseVO);
+        }
+
+        rs.close();
+        pstmt.close();
 
         return productsReleaseList;
     }
 
-    public List<ReleaseVO> selectProductsReleaseYearList() { //출고 상품 리스트(년별로 검색)
+    public List<ReleaseVO> selectProductsReleaseYearList() throws SQLException, IOException { //출고 상품 리스트(년별로 검색)
         ArrayList<ReleaseVO> productsReleaseYearList = new ArrayList<ReleaseVO>();
         String query = "SELECT p.product_id, p.product_name, p.product_brand," +
-                "d.request_quantity, DATE_FORMAT(request_date, '%Y-%m-%d'), DATE_FORMAT(approved_date, '%Y-%m-%d')" +
-                "FROM delivery_request AS d, user AS u, stock AS s, product AS p" +
-                "WHERE d.user_id = u.user_id AND u.user_id = s.user_id AND s.product_id = p.product_id" +
-                "d.approved_date IS NOT NULL AND" +
-                "d.approved_date BETWEEN '?-01-01' AND '?-12-31'";
+                " d.request_quantity, DATE_FORMAT(request_date, '%Y-%m-%d'), DATE_FORMAT(approved_date, '%Y-%m-%d')" +
+                " FROM delivery_request AS d, user AS u, stock AS s, product AS p" +
+                " WHERE d.user_id = u.user_id AND u.user_id = s.user_id AND s.product_id = p.product_id" +
+                " d.approved_date IS NOT NULL AND" +
+                " d.approved_date BETWEEN '?-01-01' AND '?-12-31'";
+
+        System.out.print("연도 검색 : ");
+        int productName = Integer.parseInt(br.readLine());
+
+        this.connection = conncp.getConnection(100);
+
+        pstmt = connection.prepareStatement(query);
+        pstmt.setInt(1,productName);
+
+
+        rs = pstmt.executeQuery();
+        conncp.releaseConnection(this.connection);
+
+        while(rs.next()){
+            ReleaseVO releaseVO = new ReleaseVO(
+                rs.getInt(1),
+                rs.getInt(2),
+                rs.getString(3),
+                rs.getString(4),
+                rs.getInt(5),
+                rs.getDate(6),
+                rs.getDate(7)
+            );
+            productsReleaseYearList.add(releaseVO);
+        }
+
+        rs.close();
+        pstmt.close();
 
         return productsReleaseYearList;
     }
@@ -246,10 +479,10 @@ DELIMITER ;*/
     public List<WaybillVO> selectWaybillYearList() { //운송장 리스트(년도별 조회)
         ArrayList<WaybillVO> waybillYearList = new ArrayList<WaybillVO>();
         String query = "SELECT waybill_id, DATE_FORMAT(depart_date, '%Y-%m-%d')," +
-                "product_id, product_name, " +
-                "start_address, arrive_address, arrive_address_detail" +
-                "FROM waybill" +
-                "WHERE depart_date BETWEEN '?-01-01' AND '?-12-31'";
+                " product_id, product_name, " +
+                " start_address, arrive_address, arrive_address_detail" +
+                " FROM waybill" +
+                " WHERE depart_date BETWEEN '?-01-01' AND '?-12-31'";
 
         return waybillYearList;
     }
@@ -276,12 +509,90 @@ DELIMITER ;*/
         return waybillDayList;
     }
 
-    public List<WaybillVO> selectWaybillDetail() { //운송장 상세보기(조회)
+    public List<WaybillVO> selectWaybillDetail() throws IOException, SQLException { //운송장 상세보기(조회)
         ArrayList<WaybillVO> waybillDetail = new ArrayList<WaybillVO>();
-        String query = "SELECT * FROM waybill WHERE waybill_id = ?";
+        String query = "SELECT waybill_id, delivery_request_id, depart_date, "
+            + " product_id, product_name, delivery_quantity, "
+            + " business_name, start_address, business_tel, "
+            + " arrive_address, arrive_address_detail, request_comment "
+            + " FROM waybill "
+            + " WHERE delivery_request_id = ? ";
+
+        System.out.print("조회할 운송장 번호를 입력해주세요 : ");
+        int waybillId = Integer.parseInt(br.readLine());
+
+        this.connection = conncp.getConnection(100);
+
+        pstmt = connection.prepareStatement(query);
+        pstmt.setInt(1, waybillId);
+
+        rs = pstmt.executeQuery();
+        conncp.releaseConnection(this.connection);
+
+        while(rs.next()){
+            WaybillVO waybillVO = new WaybillVO(
+                rs.getInt(1),
+                rs.getInt(2),
+                rs.getDate(3),
+                rs.getInt(4),
+                rs.getString(5),
+                rs.getInt(6),
+                rs.getString(7),
+                rs.getString(8),
+                rs.getString(9),
+                rs.getString(10),
+                rs.getString(11),
+                rs.getString(12)
+            );
+            waybillDetail.add(waybillVO);
+        }
+
+        pstmt.close();
 
         return waybillDetail;
     }
+
+    public List<WaybillVO> selectWaybillDetailFromReleaseNo() throws SQLException, IOException { //운송장 상세보기(출고번호로 조회)
+        ArrayList<WaybillVO> waybillDetail = new ArrayList<WaybillVO>();
+        String query = "SELECT waybill_id, delivery_request_id, depart_date, "
+            + " product_id, product_name, delivery_quantity, "
+            + " business_name, start_address, business_tel, "
+            + " arrive_address, arrive_address_detail, request_comment "
+            + " FROM waybill "
+            + " WHERE delivery_request_id = ? ";
+
+
+        this.connection = conncp.getConnection(100);
+
+        pstmt = connection.prepareStatement(query);
+        pstmt.setInt(1, requestId);
+
+        rs = pstmt.executeQuery();
+        conncp.releaseConnection(this.connection);
+
+        while(rs.next()){
+            WaybillVO waybillVO = new WaybillVO(
+            rs.getInt(1),
+            rs.getInt(2),
+            rs.getDate(3),
+            rs.getInt(4),
+            rs.getString(5),
+            rs.getInt(6),
+            rs.getString(7),
+            rs.getString(8),
+            rs.getString(9),
+            rs.getString(10),
+            rs.getString(11),
+            rs.getString(12)
+                );
+            waybillDetail.add(waybillVO);
+        }
+
+        pstmt.close();
+
+        return waybillDetail;
+    }
+
 
     public boolean updateWaybill() { //운송장 수정
         String query = "UPDATE waybill" +
@@ -293,8 +604,13 @@ DELIMITER ;*/
     }
 
     @Override
-    public boolean registerDispatch(DispatchVO data) throws SQLException, InterruptedException { //배차 등록
-        String query = "INSERT INTO VALUES(?,?)";
+    public boolean registerDispatch() throws SQLException, InterruptedException, IOException { //배차 등록
+        String query = "INSERT INTO dispatch VALUES(?,?)";
+
+        System.out.print("운송장 번호 : ");
+        int waybillId = Integer.parseInt(br.readLine());
+        System.out.print("차량 번호 : ");
+        String carNumber = br.readLine();
 
         boolean result1 = false;
 
@@ -302,8 +618,8 @@ DELIMITER ;*/
 
         try {
             pstmt = connection.prepareStatement(query);
-            pstmt.setInt(1, data.getWaybillId());
-            pstmt.setString(2, data.getCarNumber());
+            pstmt.setInt(1, waybillId);
+            pstmt.setString(2, carNumber);
 
             int result = pstmt.executeUpdate();
             pstmt.close();
@@ -380,11 +696,27 @@ DELIMITER ;*/
         return result1;
     }
 
-    public List<CarVO> selectCarAllList() { //차량 조회(전체 조회)
-        ArrayList<CarVO> CarAllList = new ArrayList<>();
-        String query = "SELECT * FROM car";
+    public List<CarVO> selectCarAllList() throws SQLException { //차량 조회(전체 조회)
+        ArrayList<CarVO> carAllList = new ArrayList<CarVO>();
+        String query = "SELECT car_number, car_type, max_load FROM car";
 
-        return CarAllList;
+        this.connection = conncp.getConnection(100);
+        pstmt = connection.prepareStatement(query);
+        rs = pstmt.executeQuery();
+
+        conncp.releaseConnection(this.connection);
+
+        while (rs.next()) {
+            CarVO carVO = new CarVO(
+                rs.getString(1),
+                rs.getString(2),
+                rs.getInt(3));
+
+            carAllList.add(carVO);
+        }
+        rs.close();
+
+        return carAllList;
     }
 
     public boolean registerCar(CarVO data) throws SQLException, InterruptedException { //차량 등록
@@ -426,8 +758,14 @@ DELIMITER ;*/
             pstmt.setString(2, data.getCarType());
             pstmt.setInt(3, data.getMaxLoad());
 
-
             int result = pstmt.executeUpdate();
+
+            if (result == 1) {
+                result1 = true;
+            } else if (result == 0) {
+                result1 = false;
+            }
+
             pstmt.close();
 
             if (result == 1) {
