@@ -77,8 +77,13 @@ public class StocktakingImpl implements StocktakingInterface {
   }
 
   @Override
-  public List<StockVO> warehouseStatus() {
-    return List.of();
+  public void displayStorageStatus() {
+
+  }
+
+  @Override
+  public void displayClientStorageUsage() {
+
   }
 
   @Override

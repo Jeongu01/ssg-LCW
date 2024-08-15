@@ -64,7 +64,7 @@ public class StocktakingDAO {
             rs.getInt("product_id"),
             rs.getInt("quantity"));
 
-        stockList.add(stock);
+      stockList.add(stock);
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -216,14 +216,16 @@ public class StocktakingDAO {
 
 
   //창고 현황 조회
-  public void warehouseStatus()  throws SQLException, InterruptedException{
+  public void displayStorageStatus()  throws SQLException, InterruptedException{
 
     List<StockVO> stockList = new ArrayList<StockVO>();
     this.connection = conncp.getConnection(100);
     try {
-      sql = " select s.storage_id, st.storage_name, format(storage_area, \"#,###,###\") as storage_area, "
-          + " format(sum(s.storage_quantity)*area_per_product, \"#,###,###\") as 창고사용량 "
-          + " , concat(round((sum(s.storage_quantity)*area_per_product / storage_area)*100,1),'%') as \'창고용적률\' "
+      sql = " select s.storage_id as 창고번호, "
+          + " st.storage_name as 창고이름 , "
+          + " storage_area as 창고면적, "
+          + " sum(s.storage_quantity)*area_per_product as 재고량 "
+          + " , round((sum(s.storage_quantity)*area_per_product / storage_area)*100,1) as '창고사용량(%)' "
           + " from stock s "
           + " JOIN product pd ON s.product_Id = pd.product_Id "
           + " JOIN storage st ON s.storage_id = st.storage_id "
@@ -235,23 +237,68 @@ public class StocktakingDAO {
 
       conncp.releaseConnection(this.connection);
 
-      //수정하기~~~~~~~
       while(rs.next()) {
-        stock = new StockVO(
-            rs.getString("user_id"),
-            rs.getInt("storage_id"),
-            rs.getInt("product_id"),
-            rs.getInt("quantity"));
+        int storageId = rs.getInt("창고번호");
+        String storageName = rs.getString("창고이름");
+        int storageArea = rs.getInt("창고면적");
+        String storageUsage = Integer.toString(rs.getInt("재고량"));
+        String storageUsageRate = Integer.toString(rs.getInt("창고사용량(%)"))+"%";
 
-        stockList.add(stock);
+        System.out.println("-------------------------------------------------------------------------------------------");
+        System.out.println("  창고번호      |     창고이름      |     창고면적     |    재고량     |     창고사용량(%) ");
+        System.out.println("-------------------------------------------------------------------------------------------");
+        System.out.println( storageId+"    "+storageName+"    "+storageArea+"   "+storageUsage+"    "+storageUsageRate );
+        System.out.println("-------------------------------------------------------------------------------------------");
+
       }
     } catch (Exception e) {
       e.printStackTrace();
     }
-
   }
 
+  //거래처 현황 조회 displayClientStorageUsage
+  public void displayClientStorageUsage()  throws SQLException, InterruptedException{
 
+
+    this.connection = conncp.getConnection(100);
+    try {
+      sql = " select u.user_id as 고객번호, "
+          + " s.storage_id as 창고번호, "
+          + " st.storage_name as 창고이름 , "
+          + " storage_area as 창고면적, "
+          + " sum(s.storage_quantity)*area_per_product as 재고량 "
+          + " , round((sum(s.storage_quantity)*area_per_product / storage_area)*100,1) as '창고사용량(%)' "
+          + " from stock s "
+          + " JOIN product pd ON s.product_Id = pd.product_Id "
+          + " JOIN storage st ON s.storage_id = st.storage_id "
+          + " JOIN user u ON u.user_id = s.user_id"
+          + " group by u.user_id, s.product_id, s.storage_id";
+
+      pstmt = connection.prepareStatement(sql);
+
+      rs = pstmt.executeQuery();
+
+      conncp.releaseConnection(this.connection);
+
+      while(rs.next()) {
+        String userId = rs.getString("고객번호");
+        int storageId = rs.getInt("창고번호");
+        String storageName = rs.getString("창고이름");
+        int storageArea = rs.getInt("창고면적");
+        String storageUsage = Integer.toString(rs.getInt("재고량"));
+        String storageUsageRate = Integer.toString(rs.getInt("창고사용량(%)"))+"%";
+
+        System.out.println("-------------------------------------------------------------------------------------------------------");
+        System.out.println("  고객번호      |     창고번호      |     창고이름      |     창고면적     |    재고량     |     창고사용량(%) ");
+        System.out.println("-------------------------------------------------------------------------------------------------------");
+        System.out.println( userId+"    "+storageId+"    "+storageName+"    "+storageArea+"   "+storageUsage+"    "+storageUsageRate );
+        System.out.println("--------------------------------------------------------------------------------------------------------");
+
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 
 
 

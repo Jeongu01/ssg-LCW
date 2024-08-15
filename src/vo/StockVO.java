@@ -7,8 +7,12 @@ import lombok.Data;
 @AllArgsConstructor
 public class StockVO {
 
+  StockVO(){}
+
   private String userId;
   private int storageId;
   private int productId;
   private int quantity;
+
+
 }
