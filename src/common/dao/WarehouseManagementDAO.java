@@ -40,6 +40,7 @@ public class WarehouseManagementDAO {
             System.err.println(e.getMessage());
         }finally {
             conncp.releaseConnection(this.connection);
+            connection = null;
         }
 
         return ret;
@@ -65,6 +66,7 @@ public class WarehouseManagementDAO {
             System.err.println(e.getMessage());
         }finally {
             conncp.releaseConnection(this.connection);
+            connection = null;
         }
 
         return ret;
@@ -90,6 +92,7 @@ public class WarehouseManagementDAO {
             System.err.println(e.getMessage());
         }finally {
             conncp.releaseConnection(this.connection);
+            connection = null;
         }
 
         return ret;
@@ -115,6 +118,7 @@ public class WarehouseManagementDAO {
             System.err.println(e.getMessage());
         }finally {
             conncp.releaseConnection(this.connection);
+            connection = null;
         }
 
         return ret;
@@ -140,6 +144,7 @@ public class WarehouseManagementDAO {
             System.err.println(e.getMessage());
         }finally {
             conncp.releaseConnection(this.connection);
+            connection = null;
         }
     }
     public void deleteWarehouse(WarehouseVO data){
@@ -153,6 +158,9 @@ public class WarehouseManagementDAO {
             pstmt.close();
         }catch (SQLException e){
             System.err.println(e.getMessage());
+        }finally {
+            conncp.releaseConnection(this.connection);
+            connection = null;
         }
     }
 }

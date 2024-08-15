@@ -3,10 +3,7 @@ package service.impl;
 import common.dao.FinancialManagementDAO;
 import service.FMservice;
 import service.FMserviceGM;
-import vo.ContractVO;
-import vo.ExpenditureDetailsVO;
-import vo.RevenueVO;
-import vo.SalesDetailsVO;
+import vo.*;
 
 import java.sql.Date;
 import java.util.ArrayList;
@@ -20,8 +17,8 @@ public class FinancialManagementImpl implements FMserviceGM, FMservice {
     }
 
     @Override
-    public ArrayList<ContractVO> InquiryContract(Date date) {
-        return dao.selectContracts("");
+    public ArrayList<ContractVO> InquiryContract(UserVO user) {
+        return dao.selectContracts(user);
     }
 
     @Override
@@ -44,6 +41,11 @@ public class FinancialManagementImpl implements FMserviceGM, FMservice {
         ArrayList<ExpenditureDetailsVO> expDetList = inquiryExpDet(null,date);
         ArrayList<SalesDetailsVO> salDetList = inquirySalDet(null,date);
         //do something!!
+        return null;
+    }
+
+    @Override
+    public ArrayList<ContractVO> inquiryAllContract() {
         return null;
     }
 
