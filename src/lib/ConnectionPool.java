@@ -45,18 +45,21 @@ public class ConnectionPool {
         return DriverManager.getConnection(url,user,password);
     }
     //커넥션 객체 획득
-    public synchronized Connection getConnection(long timeout) throws SQLException, InterruptedException {
+    public synchronized Connection getConnection(long timeout){
         long startTime = System.currentTimeMillis();
-
-        while(connectionPool.isEmpty()){//커넥션 풀이 빈경우
-            long elapsedTime = System.currentTimeMillis() - startTime;//경과된 시간..
-            long waitTime = timeout - elapsedTime;
-            if(waitTime <= 0){
-                throw new SQLException("커넥션 획득을 기다리는 시간을 초과했습니다.");
+        try {
+            while(connectionPool.isEmpty()){//커넥션 풀이 빈경우
+                long elapsedTime = System.currentTimeMillis() - startTime;//경과된 시간..
+                long waitTime = timeout - elapsedTime;
+                if(waitTime <= 0){
+                    throw new SQLException("커넥션 획득을 기다리는 시간을 초과했습니다.");
+                }
+                //연결이 반환 될 때까지 기다린다.
+                //wait()메서드는 다른 스레드가 notify()를 호출하거나 waitTime동안 대기
+                wait(waitTime);
             }
-            //연결이 반환 될 때까지 기다린다.
-            //wait()메서드는 다른 스레드가 notify()를 호출하거나 waitTime동안 대기
-            wait(waitTime);
+        }catch (SQLException | InterruptedException e){
+            System.err.println(e.getMessage());
         }
 
         //poll()은 비어있으면 null을 반환한다.

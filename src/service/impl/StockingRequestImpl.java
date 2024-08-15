@@ -1,10 +1,12 @@
 package service.impl;
 
 import common.dao.StockingRequestDAO;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import service.StockingRequestServiceManager;
 import service.StockingRequestServiceSupplier;
 import vo.StockingRequestVO;
+import vo.UserVO;
 
 public class StockingRequestImpl implements StockingRequestServiceManager, StockingRequestServiceSupplier {
 
@@ -26,17 +28,20 @@ public class StockingRequestImpl implements StockingRequestServiceManager, Stock
   }
 
   @Override
-  public ArrayList<StockingRequestVO> getApprovedRecevingProcessingList() {
+  public ArrayList<StockingRequestVO> getApprovedRecevingProcessingList()
+      throws SQLException, InterruptedException {
     return dao.selectApprovedStockingRequest();
   }
 
   @Override
-  public ArrayList<StockingRequestVO> inquiryAllWarehouseRequests() {
+  public ArrayList<StockingRequestVO> inquiryAllWarehouseRequests()
+      throws SQLException, InterruptedException {
     return dao.selectAllStockingRequest();
   }
 
   @Override
-  public ArrayList<StockingRequestVO> getUnApprovedRecevingProcessingList() {
+  public ArrayList<StockingRequestVO> getUnApprovedRecevingProcessingList()
+      throws SQLException, InterruptedException {
     return dao.selectUnApprovedStockingRequest();
   }
 
@@ -46,7 +51,9 @@ public class StockingRequestImpl implements StockingRequestServiceManager, Stock
   }
 
   @Override
-  public ArrayList<StockingRequestVO> inquiryWarehouseRequests() {
-    return dao.selectInquiryWarehouseRequests();
+  public ArrayList<StockingRequestVO> inquiryWarehouseRequests()
+      throws SQLException, InterruptedException {
+    UserVO user = new UserVO();
+    return dao.selectInquiryWarehouseRequests(user.getUserId());
   }
 }
