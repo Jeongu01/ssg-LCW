@@ -12,7 +12,6 @@ import util.UserStatus;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserVO {
-
   private String userId;
   private String password;
   private String name;
@@ -22,6 +21,6 @@ public class UserVO {
   private Role role;
   private UserStatus status;
   private String address;
-  private int businessNumber;
-  private int businessName;
+  private String businessName;
+  private String businessNumber;
 }
