@@ -1,11 +1,11 @@
 package service;
 
 import vo.ContractVO;
+import vo.UserVO;
 
-import java.sql.Date;
 import java.util.ArrayList;
 
 public interface FMservice {
-    public ArrayList<ContractVO> InquiryContract(Date date);
+    public ArrayList<ContractVO> InquiryContract(UserVO user);
     public void requestContract(ContractVO data);
 }

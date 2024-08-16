@@ -26,13 +26,12 @@ public class WarehouseManagementImpl implements WMServiceGM {
     }
 
     @Override
-    public ArrayList<WarehouseVO> inquiryAllWarehouse() throws SQLException, InterruptedException {  // 모든 창고 조회
+    public ArrayList<WarehouseVO> inquiryAllWarehouse() {  // 모든 창고 조회
         return dao.selectAllWarehouse();
     }
 
     @Override
-    public ArrayList<WarehouseVO> warehouseInquiryById() { // 자기의 창고 조회..싱글턴 유저가 있겟다.
-        UserVO user = new UserVO();
+    public ArrayList<WarehouseVO> warehouseInquiryById(UserVO user) { // 자기의 창고 조회..싱글턴 유저가 있겟다.
         return dao.selectWarehouseById(user.getUserId());
     }
 
