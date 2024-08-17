@@ -1,9 +1,6 @@
 package service;
 
-import vo.ContractVO;
-import vo.ExpenditureDetailsVO;
-import vo.RevenueVO;
-import vo.SalesDetailsVO;
+import vo.*;
 
 import java.sql.Date;
 import java.util.ArrayList;
@@ -11,12 +8,12 @@ import java.util.ArrayList;
 public interface FMserviceWM {
     public ArrayList<ContractVO> inquiryAllContract();
 
-    public ArrayList<ExpenditureDetailsVO> inquiryExpDet(String userId,Date date);
+    public ArrayList<ExpenditureDetailsVO> inquiryExpDet(UserVO user, Date begin, Date end);
     public void insertExpDet(ExpenditureDetailsVO data);
     public void updateExpDet(ExpenditureDetailsVO data);
     public void deleteExpDet(ExpenditureDetailsVO data);
 
-    public ArrayList<SalesDetailsVO> inquirySalDet(String userId, Date date);
+    public ArrayList<SalesDetailsVO> inquirySalDet(UserVO user, Date begin, Date end);
 
-    public RevenueVO inquiryRevenueByWarehouse(int warehouseId ,Date date);
+    public RevenueVO inquiryRevenueByWarehouse(UserVO user,Date begin,Date end);
 }
