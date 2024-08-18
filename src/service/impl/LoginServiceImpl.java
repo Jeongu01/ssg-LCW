@@ -99,32 +99,7 @@ public class LoginServiceImpl implements LoginService {
         System.out.print("비밀번호: ");
         String pwd = br.readLine();
 
-        connection = connectionPool.getConnection(100);
-        query =
-            "SELECT user_id, password, name, birth, email, tel, role, status, address, business_number, business_name"
-                + " FROM user"
-                + " WHERE user_id = ? and password = ?";
-
-        pstmt = connection.prepareStatement(query);
-        pstmt.setString(1, id);
-        pstmt.setString(2, pwd);
-        rs = pstmt.executeQuery();
-
-        while (rs.next()) {
-          userVO = new UserVO(
-              rs.getString("user_id"),
-              rs.getString("password"),
-              rs.getString("name"),
-              new Date(rs.getDate("birth").getTime()),
-              rs.getString("email"),
-              rs.getString("tel"),
-              Role.valueOf(rs.getString("role")),
-              UserStatus.valueOf(rs.getString("status")),
-              rs.getString("address"),
-              rs.getString("business_name"),
-              rs.getString("business_number")
-          );
-        }
+        userVO = dao.selectUser(id, pwd);
 
         menuService.showMenu(userVO);
 
@@ -156,15 +131,14 @@ public class LoginServiceImpl implements LoginService {
     System.out.println("4.공급자");
     System.out.println("5.쇼핑몰 운영자");
     int sellectRole = Integer.parseInt(br.readLine());
-    boolean registerSuccess = false;
 
-    String role = switch (sellectRole) {
-      case 1 -> Role.EMPLOYEE.toString();
-      case 2 -> Role.WH_MANAGER.toString();
-      case 3 -> Role.DELIVERY_DRIVER.toString();
-      case 4 -> Role.SUPPLIER.toString();
-      case 5 -> Role.STORE_OPERATOR.toString();
-      default -> Role.GUEST.toString(); // TODO : 수정 필요
+    Role role = switch (sellectRole) {
+      case 1 -> Role.EMPLOYEE;
+      case 2 -> Role.WH_MANAGER;
+      case 3 -> Role.DELIVERY_DRIVER;
+      case 4 -> Role.SUPPLIER;
+      case 5 -> Role.STORE_OPERATOR;
+      default -> Role.GUEST; // TODO : 수정 필요
     };
 
     System.out.print("아이디: ");
@@ -187,36 +161,8 @@ public class LoginServiceImpl implements LoginService {
     String businessNumber = br.readLine();
 
     // TODO : 여기부터 DAO
-//    dao.insertUser()
-    try {
-
-      connection = connectionPool.getConnection(100);
-      query =
-          "INSERT INTO user(user_id, password, name, birth, email, tel, role, status, address, business_number, business_name)"
-              + " VALUES (?,?,?,?,?,?,?,?,?,?,?)";
-
-      pstmt = connection.prepareStatement(query);
-      pstmt.setString(1, userId);
-      pstmt.setString(2, password);
-      pstmt.setString(3, name);
-      pstmt.setDate(4, birth);
-      pstmt.setString(5, email);
-      pstmt.setString(6, tel);
-      pstmt.setString(7, role);
-      pstmt.setString(8, UserStatus.WAITING.toString());
-      pstmt.setString(9, address);
-      pstmt.setString(10, businessName);
-      pstmt.setString(11, businessNumber);
-      registerSuccess = pstmt.executeUpdate() != 0;
-      pstmt.close();
-
-    } catch (Exception e) {
-      e.printStackTrace();
-    } finally {
-      connectionPool.releaseConnection(connection);
-    }
-
-    return registerSuccess;
+    UserVO userVO = new UserVO(userId, password, name, birth, email, tel, role, UserStatus.WAITING, address, businessName, businessNumber);
+    return dao.insertUser(userVO);
   }
 
   /*
@@ -229,19 +175,7 @@ public class LoginServiceImpl implements LoginService {
     System.out.println("이메일 주소를 입력해주세요.");
     String email = br.readLine();
 
-    connection = connectionPool.getConnection(100);
-    query = "SELECT user_id"
-        + " FROM user"
-        + " WHERE email = ?";
-
-    pstmt = connection.prepareStatement(query);
-    pstmt.setString(1, email);
-    rs = pstmt.executeQuery();
-    while (rs.next()) {
-      userId = rs.getString("user_id"); // TODO : 중간에 몇글자는 *로 숨겨줄까..
-    }
-    pstmt.close();
-    connectionPool.releaseConnection(connection);
+    userId = dao.selectUserId(email);
     return userId;
   }
 
@@ -254,19 +188,7 @@ public class LoginServiceImpl implements LoginService {
     System.out.println("아이디를 입력해주세요.");
     String userId = br.readLine();
 
-    connection = connectionPool.getConnection(100);
-    query = "SELECT password"
-        + " FROM user"
-        + " WHERE user_id = ?";
-
-    pstmt = connection.prepareStatement(query);
-    pstmt.setString(1, userId);
-    rs = pstmt.executeQuery();
-    while (rs.next()) {
-      password = rs.getString("password"); // TODO : 중간에 몇글자는 *로 숨겨줄까..
-    }
-    pstmt.close();
-    connectionPool.releaseConnection(connection);
+    password = dao.selectUserPwd(userId);
     return password;
   }
 }

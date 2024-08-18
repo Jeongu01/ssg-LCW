@@ -1,24 +1,22 @@
 package service.impl;
 
+import common.dao.UserManagementDAO;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import lib.ConnectionPool;
 import service.UserManagementServiceForUser;
-import util.Role;
-import util.UserStatus;
 import vo.UserVO;
 
 public class UserManagementServiceForUserImpl implements UserManagementServiceForUser {
 
-  private ConnectionPool connectionPool = ConnectionPool.getInstance();
-  private Connection connection = null;
   private BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-  private String query;
-  private PreparedStatement pstmt;
+  private UserVO userVO = null;
+  private UserManagementDAO dao = null;
+
+  public UserManagementServiceForUserImpl(UserVO userVO) {
+    dao = new UserManagementDAO();
+    this.userVO = userVO;
+  }
 
   /*
   * 내 정보 상세 보기
@@ -32,12 +30,7 @@ public class UserManagementServiceForUserImpl implements UserManagementServiceFo
   * 내 정보 수정
   * */
   @Override
-  public UserVO updateUserDetails(UserVO userVO)
-      throws SQLException, InterruptedException, IOException {
-
-    System.out.println(userVO);
-
-    connection = connectionPool.getConnection(100);
+  public UserVO updateUserDetails(UserVO userVO) throws IOException {
 
     System.out.println("유저(" + userVO.getUserId() + ")에 대한 변경 사항들을 입력해주십시오.");
     System.out.print("이름: ");
@@ -55,40 +48,22 @@ public class UserManagementServiceForUserImpl implements UserManagementServiceFo
     System.out.print("사업자번호: ");
     String businessNumber = br.readLine();
 
-    query = "UPDATE user"
-        + " SET name = ?, birth = ?, email = ?, tel = ?, address = ?, business_number = ?, business_name = ?"
-        + " WHERE user_id = ?";
+    UserVO updatedUser = new UserVO(
+        userVO.getUserId(),
+        userVO.getPassword(),
+        name,
+        birth,
+        email,
+        tel,
+        userVO.getRole(),
+        userVO.getStatus(),
+        address,
+        businessName,
+        businessNumber
+    );
 
-    pstmt = connection.prepareStatement(query);
 
-    pstmt.setString(1, name);
-    pstmt.setDate(2, birth);
-    pstmt.setString(3, email);
-    pstmt.setString(4, tel);
-    pstmt.setString(5, address);
-    pstmt.setString(6, businessName);
-    pstmt.setString(7, businessNumber);
-    pstmt.setString(8, userVO.getUserId());
-
-    int rows = pstmt.executeUpdate();
-
-    pstmt.close();
-    connectionPool.releaseConnection(connection);
-
-    if (rows != 0) {
-      UserVO updatedUser = new UserVO(
-          userVO.getUserId(),
-          userVO.getPassword(),
-          name,
-          birth,
-          email,
-          tel,
-          userVO.getRole(),
-          userVO.getStatus(),
-          address,
-          businessName,
-          businessNumber
-      );
+    if (dao.updateUser(updatedUser)) {
       userVO = updatedUser;
     }
 
@@ -99,8 +74,7 @@ public class UserManagementServiceForUserImpl implements UserManagementServiceFo
   * 비밀번호 변경
   * */
   @Override
-  public void updatePassword(UserVO userVO) throws SQLException, IOException {
-    connection = connectionPool.getConnection(100);
+  public boolean updatePassword(UserVO userVO) throws IOException {
     System.out.println("현재 비밀번호를 입력하세요");
     String currentPwd = br.readLine();
 
@@ -110,20 +84,10 @@ public class UserManagementServiceForUserImpl implements UserManagementServiceFo
     String checkPwd = br.readLine();
 
     if (nextPwd.equals(checkPwd)) {
-      query = "UPDATE user"
-          + " SET password = ?"
-          + " WHERE user_id = ? and password = ?";
-      pstmt = connection.prepareStatement(query);
-
-      pstmt.setString(1, nextPwd);
-      pstmt.setString(2, userVO.getUserId());
-      pstmt.setString(3, currentPwd);
+      return dao.updatePassword(userVO.getUserId(), nextPwd);
     }
 
-    pstmt.close();
-    connectionPool.releaseConnection(connection);
-
-    return;
+    return false;
 
   }
 
@@ -131,18 +95,14 @@ public class UserManagementServiceForUserImpl implements UserManagementServiceFo
   * 회원 탈퇴
   * */
   @Override
-  public void cancelAccount(UserVO userVO) throws IOException, SQLException {
-    connection = connectionPool.getConnection(100);
+  public boolean cancelAccount(UserVO userVO) throws IOException {
     System.out.println("비밀번호를 입력하세요");
     String pwd = br.readLine();
 
-    query = "DELETE FROM user"
-        + " WHERE user_id = ? AND password = ?";
+    if (pwd.equals(userVO.getPassword())) {
+      return dao.deleteUser(userVO.getUserId());
+    }
 
-    pstmt = connection.prepareStatement(query);
-    pstmt.setString(1, userVO.getUserId());
-    pstmt.setString(2, pwd);
-
-    int rows = pstmt.executeUpdate();
+    return false;
   }
 }

@@ -1,5 +1,6 @@
 package service.impl;
 
+import common.dao.UserManagementDAO;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,7 +9,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import lib.ConnectionPool;
 import service.UserManagementService;
 import util.Role;
@@ -17,45 +17,20 @@ import vo.UserVO;
 
 public class UserManagementServiceImpl implements UserManagementService {
 
-  private BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-  private ConnectionPool connectionPool = ConnectionPool.getInstance();
-  private Connection connection = null;
-  private ResultSet rs = null;
-  private PreparedStatement pstmt;
-  private String query;
+  private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+  private UserManagementDAO dao = null;
+  private UserVO userVO = null;
+
+  public UserManagementServiceImpl() {
+    dao = new UserManagementDAO();
+  }
 
   /*
    * 전체 회원 조회
    * */
   @Override
   public ArrayList<UserVO> printAllUsers() throws SQLException, InterruptedException {
-    ArrayList<UserVO> userList = new ArrayList<>();
-    connection = connectionPool.getConnection(100);
-    query =
-        "SELECT user_id, password, name, birth, email, tel, role, status, address, business_name, business_number"
-            + " FROM user";
-    pstmt = connection.prepareStatement(query);
-    rs = pstmt.executeQuery();
-
-    while (rs.next()) {
-      UserVO user = new UserVO(
-          rs.getString("user_id"),
-          rs.getString("password"),
-          rs.getString("name"),
-          new Date(rs.getDate("birth").getTime()),
-          rs.getString("email"),
-          rs.getString("tel"),
-          Role.valueOf(rs.getString("role")),
-          UserStatus.valueOf(rs.getString("status")),
-          rs.getString("address"),
-          rs.getString("business_name"),
-          rs.getString("business_number"));
-      userList.add(user);
-    }
-
-    pstmt.close();
-    connectionPool.releaseConnection(connection);
-    return userList;
+    return dao.selectAllUsers();
   }
 
   /*
@@ -63,131 +38,31 @@ public class UserManagementServiceImpl implements UserManagementService {
    * */
   @Override
   public UserVO printOneUserDetailsById(String userId) throws SQLException, InterruptedException {
-    UserVO user = null;
-    connection = connectionPool.getConnection(100);
-    query =
-        "SELECT user_id, password, name, birth, email, tel, role, status, address, business_name, business_number"
-            + " FROM user"
-            + " WHERE user_id = ?";
-    pstmt = connection.prepareStatement(query);
-    pstmt.setString(1, userId);
-    rs = pstmt.executeQuery();
-
-    while (rs.next()) {
-      user = new UserVO(
-          rs.getString("user_id"),
-          rs.getString("password"),
-          rs.getString("name"),
-          new Date(rs.getDate("birth").getTime()),
-          rs.getString("email"),
-          rs.getString("tel"),
-          Role.valueOf(rs.getString("role")),
-          UserStatus.valueOf(rs.getString("status")),
-          rs.getString("address"),
-          rs.getString("business_name"),
-          rs.getString("business_number"));
-    }
-
-    pstmt.close();
-    connectionPool.releaseConnection(connection);
-    return user;
+    return dao.selectUser(userId);
   }
 
   /*
    * 회원 상세보기 (사업자번호로 검색)
    * */
   @Override
-  public UserVO printOneUserDetailsByBusinessNumber(String businessNumber)
-      throws SQLException, InterruptedException {
-    UserVO user = null;
-    connection = connectionPool.getConnection(100);
-    query =
-        "SELECT user_id, password, name, birth, email, tel, role, status, address, business_name, business_number"
-            + " FROM user"
-            + " WHERE business_number = ?";
-    pstmt = connection.prepareStatement(query);
-    pstmt.setString(1, businessNumber);
-    rs = pstmt.executeQuery();
-
-    while (rs.next()) {
-      user = new UserVO(
-          rs.getString("user_id"),
-          rs.getString("password"),
-          rs.getString("name"),
-          new Date(rs.getDate("birth").getTime()),
-          rs.getString("email"),
-          rs.getString("tel"),
-          Role.valueOf(rs.getString("role")),
-          UserStatus.valueOf(rs.getString("status")),
-          rs.getString("address"),
-          rs.getString("business_name"),
-          rs.getString("business_number"));
-    }
-    pstmt.close();
-    connectionPool.releaseConnection(connection);
-    return user;
+  public UserVO printOneUserDetailsByBusinessNumber(String businessNumber) {
+    return dao.selectUserByBusinessNumber(businessNumber);
   }
 
   /*
    * 승인 대기자 출력
    * */
   @Override
-  public ArrayList<UserVO> printWaitingUsers() throws SQLException, InterruptedException {
-    ArrayList<UserVO> userList = new ArrayList<>();
-    connection = connectionPool.getConnection(100);
-    query =
-        "SELECT user_id, password, name, birth, email, tel, role, status, address, business_name, business_number"
-            + " FROM user"
-            + " WHERE status = ?";
-    pstmt = connection.prepareStatement(query);
-    pstmt.setString(1, UserStatus.WAITING.toString());
-    rs = pstmt.executeQuery();
-
-    while (rs.next()) {
-      UserVO userVO = new UserVO(
-          rs.getString("user_id"),
-          rs.getString("password"),
-          rs.getString("name"),
-          new Date(rs.getDate("birth").getTime()),
-          rs.getString("email"),
-          rs.getString("tel"),
-          Role.valueOf(rs.getString("role")),
-          UserStatus.valueOf(rs.getString("status")),
-          rs.getString("address"),
-          rs.getString("business_name"),
-          rs.getString("business_number"));
-      userList.add(userVO);
-    }
-    pstmt.close();
-    connectionPool.releaseConnection(connection);
-    return userList;
+  public ArrayList<UserVO> printWaitingUsers() {
+    return dao.selectWaitingUsers();
   }
 
   /*
    * 회원가입 요청 처리
    * */
   @Override
-  public boolean approveRegistrationRequest(String userId, boolean approve)
-      throws SQLException, InterruptedException {
-    connection = connectionPool.getConnection(100);
-    query = "UPDATE user"
-        + " SET status = ?"
-        + " WHERE status = ? AND user_id = ?";
-    pstmt = connection.prepareStatement(query);
-    if (approve) {   // 승인
-      pstmt.setString(1, UserStatus.ACTIVE.toString());
-    } else {        // 거부
-      pstmt.setString(1,
-          UserStatus.DENIED.toString()); // TODO : 로그인 했을 때 DENIED 라면 DELETE 되는 트리거 작성
-    }
-    pstmt.setString(2, UserStatus.WAITING.toString());
-    pstmt.setString(3, userId);
-
-    pstmt.close();
-    connectionPool.releaseConnection(connection);
-
-    int rows = pstmt.executeUpdate();
-    return rows != 0;
+  public boolean approveRegistrationRequest(String userId, boolean approve) {
+    return dao.approveRegistrationRequest(userId, approve);
   }
 
   /*
@@ -195,9 +70,7 @@ public class UserManagementServiceImpl implements UserManagementService {
   * */
   @Override
   public boolean updateUserDetails(String userId)
-      throws SQLException, InterruptedException, IOException {
-    connection = connectionPool.getConnection(100);
-
+      throws IOException {
     // TODO : Print 쪽으로 뺴기
     System.out.println("유저(" + userId + ")에 대한 변경 사항들을 입력해주십시오.");
     System.out.print("비밀번호: ");
@@ -218,13 +91,13 @@ public class UserManagementServiceImpl implements UserManagementService {
     System.out.println("4.공급자");
     System.out.println("5.쇼핑몰 운영자");
     int sellectRole = Integer.parseInt(br.readLine());
-    String role = switch (sellectRole) {
-      case 1 -> Role.EMPLOYEE.toString();
-      case 2 -> Role.WH_MANAGER.toString();
-      case 3 -> Role.DELIVERY_DRIVER.toString();
-      case 4 -> Role.SUPPLIER.toString();
-      case 5 -> Role.STORE_OPERATOR.toString();
-      default -> Role.GUEST.toString(); // TODO : 수정 필요
+    Role role = switch (sellectRole) {
+      case 1 -> Role.EMPLOYEE;
+      case 2 -> Role.WH_MANAGER;
+      case 3 -> Role.DELIVERY_DRIVER;
+      case 4 -> Role.SUPPLIER;
+      case 5 -> Role.STORE_OPERATOR;
+      default -> Role.GUEST; // TODO : 수정 필요
     };
 
     System.out.println("상태: ");
@@ -234,13 +107,13 @@ public class UserManagementServiceImpl implements UserManagementService {
     System.out.println("4.정지");
     System.out.println("5.휴면");
     int sellectStatus = Integer.parseInt(br.readLine());
-    String status = switch (sellectStatus){
-      case 1 -> UserStatus.ACTIVE.toString();
-      case 2 -> UserStatus.VIP.toString();
-      case 3 -> UserStatus.WAITING.toString();
-      case 4 -> UserStatus.BANNED.toString();
-      case 5 -> UserStatus.DORMANT.toString();
-      default -> "여기엔 뭘 넣지";  // TODO : 진짜 뭐 넣지
+    UserStatus status = switch (sellectStatus){
+      case 1 -> UserStatus.ACTIVE;
+      case 2 -> UserStatus.VIP;
+      case 3 -> UserStatus.WAITING;
+      case 4 -> UserStatus.BANNED;
+      case 5 -> UserStatus.DORMANT;
+      default -> UserStatus.DENIED; // TODO : 다시 입력해달라고 수정해야됨
     };
 
     System.out.print("주소: ");
@@ -251,39 +124,15 @@ public class UserManagementServiceImpl implements UserManagementService {
     String businessNumber = br.readLine();
 
     // TODO : 이 밑으론 DAO
-    query = "UPDATE user"
-        + " SET password = ?, name = ?, birth = ?, email = ?, tel = ?, role = ?, status = ?, address = ?, business_number = ?, business_name = ?"
-        + " WHERE user_id = ?";
-
-    pstmt = connection.prepareStatement(query);
-
-    pstmt.setString(1, password);
-    pstmt.setString(2, name);
-    pstmt.setDate(3, birth);
-    pstmt.setString(4, email);
-    pstmt.setString(5, tel);
-    pstmt.setString(6, role);
-    pstmt.setString(7, status);
-    pstmt.setString(8, address);
-    pstmt.setString(9, businessName);
-    pstmt.setString(10, businessNumber);
-    pstmt.setString(11, userId);
-
-    int rows = pstmt.executeUpdate();
-
-    pstmt.close();
-    connectionPool.releaseConnection(connection);
-
-    return rows != 0;
+    UserVO userVO = new UserVO(userId, password, name, birth, email, tel, role, status, address, businessName, businessNumber);
+    return dao.updateUser(userVO);
   }
 
   /*
   * 회원 삭제
   * */
   @Override
-  public boolean deleteUser(String userId) throws SQLException, InterruptedException, IOException {
-    connection = connectionPool.getConnection(100);
-
+  public boolean deleteUser(String userId) throws IOException {
     // TODO : Print 쪽으로 빼기
     System.out.println("비밀번호를 입력해주세요.");
     String checkPwd = br.readLine();
@@ -294,18 +143,7 @@ public class UserManagementServiceImpl implements UserManagementService {
     if (lastConfirm.equals('N')) return false;
 
     // TODO : 이 밑으론 DAO
-    query = "DELETE FROM user"
-        + " WHERE user_id = ? AND password = ?";
-
-    pstmt = connection.prepareStatement(query);
-    pstmt.setString(1, userId);
-    pstmt.setString(2, checkPwd);
-    int rows = pstmt.executeUpdate();
-
-    pstmt.close();
-    connectionPool.releaseConnection(connection);
-
-    return rows != 0;
+    return dao.deleteUser(userId);
   }
 
 

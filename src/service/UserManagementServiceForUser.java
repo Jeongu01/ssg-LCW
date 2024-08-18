@@ -10,7 +10,7 @@ public interface UserManagementServiceForUser {
   public UserVO updateUserDetails(UserVO userVO)
       throws SQLException, InterruptedException, IOException;
 
-  public void updatePassword(UserVO userVO) throws SQLException, IOException;
+  public boolean updatePassword(UserVO userVO) throws SQLException, IOException;
 
-  public void cancelAccount(UserVO userVO) throws IOException, SQLException;
+  public boolean cancelAccount(UserVO userVO) throws IOException, SQLException;
 }
