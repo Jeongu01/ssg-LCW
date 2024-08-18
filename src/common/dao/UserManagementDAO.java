@@ -60,7 +60,42 @@ public class UserManagementDAO {
     return userList;
   }
 
-  public UserVO selectUserByUserId(String userId) {
+  public ArrayList<UserVO> selectWaitingUsers() {
+    ArrayList<UserVO> userList = new ArrayList<>();
+    connection = connectionPool.getConnection(100);
+    String query =
+        "SELECT user_id, password, name, birth, email, tel, role, status, address, business_name, business_number"
+            + " FROM user"
+            + " WHERE status = 'WAITING'";  // TODO : 프로시저
+    try {
+      PreparedStatement pstmt = connection.prepareStatement(query);
+      rs = pstmt.executeQuery();
+
+      while (rs.next()) {
+        UserVO userVO = new UserVO(
+            rs.getString("user_id"),
+            rs.getString("password"),
+            rs.getString("name"),
+            new Date(rs.getDate("birth").getTime()),
+            rs.getString("email"),
+            rs.getString("tel"),
+            Role.valueOf(rs.getString("role")),
+            UserStatus.valueOf(rs.getString("status")),
+            rs.getString("address"),
+            rs.getString("business_name"),
+            rs.getString("business_number"));
+        userList.add(userVO);
+      }
+      pstmt.close();
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    } finally {
+      connectionPool.releaseConnection(connection);
+    }
+    return userList;
+  }
+
+  public UserVO selectUser(String userId) {
     UserVO user = null;
     connection = connectionPool.getConnection(100);
     String query =
@@ -70,6 +105,44 @@ public class UserManagementDAO {
     try {
       PreparedStatement pstmt = connection.prepareStatement(query);
       pstmt.setString(1, userId);
+      rs = pstmt.executeQuery();
+
+      while (rs.next()) {
+        user = new UserVO(
+            rs.getString("user_id"),
+            rs.getString("password"),
+            rs.getString("name"),
+            new Date(rs.getDate("birth").getTime()),
+            rs.getString("email"),
+            rs.getString("tel"),
+            Role.valueOf(rs.getString("role")),
+            UserStatus.valueOf(rs.getString("status")),
+            rs.getString("address"),
+            rs.getString("business_name"),
+            rs.getString("business_number"));
+      }
+
+      pstmt.close();
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    } finally {
+      connectionPool.releaseConnection(connection);
+    }
+
+    return user;
+  }
+
+  public UserVO selectUser(String userId, String password) {
+    UserVO user = null;
+    connection = connectionPool.getConnection(100);
+    String query =
+        "SELECT user_id, password, name, birth, email, tel, role, status, address, business_name, business_number"
+            + " FROM user"
+            + " WHERE user_id = ? AND password = ?";
+    try {
+      PreparedStatement pstmt = connection.prepareStatement(query);
+      pstmt.setString(1, userId);
+      pstmt.setString(2, password);
       rs = pstmt.executeQuery();
 
       while (rs.next()) {
@@ -130,6 +203,52 @@ public class UserManagementDAO {
       connectionPool.releaseConnection(connection);
     }
     return user;
+  }
+
+  public String selectUserId(String email) {
+    String userId = "";
+    connection = connectionPool.getConnection(100);
+    String query = "SELECT user_id"
+        + " FROM user"
+        + " WHERE email = ?";
+    try {
+      PreparedStatement pstmt = connection.prepareStatement(query);
+      pstmt.setString(1, email);
+      rs = pstmt.executeQuery();
+
+      while (rs.next()) {
+        userId = rs.getString("user_id");
+      }
+      pstmt.close();
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    } finally {
+      connectionPool.releaseConnection(connection);
+    }
+    return userId;
+  }
+
+  public String selectUserPwd(String userId) {
+    String password = "";
+    connection = connectionPool.getConnection(100);
+    String query = "SELECT password"
+        + " FROM user"
+        + " WHERE user_id = ?";
+    try {
+      PreparedStatement pstmt = connection.prepareStatement(query);
+      pstmt.setString(1, userId);
+      rs = pstmt.executeQuery();
+
+      while (rs.next()) {
+        password = rs.getString("password");
+      }
+      pstmt.close();
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    } finally {
+      connectionPool.releaseConnection(connection);
+    }
+    return password;
   }
 
   public boolean insertUser(UserVO data) {
@@ -201,7 +320,34 @@ public class UserManagementDAO {
     return updateSuccess;
   }
 
-  public boolean deleteUser(UserVO data) {
+  public boolean updatePassword(String userId, String password) {
+    boolean updateSuccess = false;
+    connection = connectionPool.getConnection(100);
+
+    String query = "UPDATE user"
+        + " SET password = ?"
+        + " WHERE user_id = ?";
+
+    try {
+      PreparedStatement pstmt = connection.prepareStatement(query);
+
+      pstmt.setString(1, password);
+      pstmt.setString(2, userId);
+
+      int rows = pstmt.executeUpdate();
+      updateSuccess = rows != 0;
+
+      pstmt.close();
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    } finally {
+      connectionPool.releaseConnection(connection);
+    }
+
+    return updateSuccess;
+  }
+
+  public boolean deleteUser(String userId) {
     boolean deleteSuccess = false;
     connection = connectionPool.getConnection(100);
 
@@ -210,7 +356,7 @@ public class UserManagementDAO {
 
     try {
       PreparedStatement pstmt = connection.prepareStatement(query);
-      pstmt.setString(1, data.getUserId());
+      pstmt.setString(1, userId);
       int rows = pstmt.executeUpdate();
       deleteSuccess = rows != 0;
 
@@ -222,5 +368,39 @@ public class UserManagementDAO {
     }
 
     return deleteSuccess;
+  }
+
+  public boolean approveRegistrationRequest(String userId, boolean approve) {
+    boolean updateSuccess = false;
+    connection = connectionPool.getConnection(100);
+
+    String query = "UPDATE user"
+        + " SET status = case when ? then 'ACTIVE' else 'DENIED' end"
+        + " WHERE status = 'WAITING'"
+        + " AND user_id = ?";
+
+    try {
+      PreparedStatement pstmt = connection.prepareStatement(query);
+      pstmt.setBoolean(1, approve);
+      pstmt.setString(2, userId);
+
+//      if (approve) {   // 승인
+//        pstmt.setString(1, UserStatus.ACTIVE.toString());
+//      } else {        // 거부
+//        pstmt.setString(1,
+//            UserStatus.DENIED.toString()); // TODO : 로그인 했을 때 DENIED 라면 DELETE 되는 트리거 작성
+//      }
+
+      int rows = pstmt.executeUpdate();
+      updateSuccess = rows != 0;
+
+      pstmt.close();
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    } finally {
+      connectionPool.releaseConnection(connection);
+    }
+
+    return updateSuccess;
   }
 }
