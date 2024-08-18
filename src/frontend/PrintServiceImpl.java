@@ -43,9 +43,9 @@ public class PrintServiceImpl {
         if(sel<=0&&sel>range) throw new WrongInputNumberException();
         return sel;
     }
-    public PrintFunctionName printStartMenu(BufferedReader br) throws IOException, ExitException{
+    public PrintFunctionName printStartMenu(MainVO data,BufferedReader br) throws IOException, ExitException{
         PrintFunctionName funName = null;
-
+        data = new MainVO(new UserVO(),-1);
         System.out.println(
                         "1. 로그인\n"+
                         "2. 회원가입\n"+
@@ -68,8 +68,7 @@ public class PrintServiceImpl {
         }
         return funName;
     }
-    //회원로그인시 userVO에 id,password담아서 돌려줌...비회원시 Role = Guest돌려주기로
-    public PrintFunctionName printLoginMenu(MainVO data, BufferedReader br) throws ExitException,WrongInputNumberException,IOException {
+    public PrintFunctionName printLoginMenu(MainVO data, BufferedReader br) throws IOException {
         PrintFunctionName funName = null;
         UserVO user = data.getUser();
         System.out.println(
@@ -177,12 +176,50 @@ public class PrintServiceImpl {
         data.setWarehouseId(Integer.parseInt(br.readLine()));
     }
 
-    public void printFindID(String email,BufferedReader br) throws IOException{
+    public PrintFunctionName printFindID(String email,BufferedReader br) throws IOException{
+        PrintFunctionName funName = null;
         System.out.println("이메일 주소를 입력해주세요.");
         email = br.readLine();
+        return funName = PrintFunctionName.PRINT_START_MENU;
     }
-    public void printFindPW(String userId, BufferedReader br) throws IOException{
+    public PrintFunctionName printFindPW(String userId, BufferedReader br) throws IOException{
+        PrintFunctionName funName = null;
         System.out.println("아이디를 입력해주세요.");
         userId = br.readLine();
+        return funName = PrintFunctionName.PRINT_START_MENU;
     }
+
+    public PrintFunctionName PrintMainMenu(BufferedReader br)throws IOException{
+        PrintFunctionName funName = null;
+        System.out.flush();
+        this.printLogo();
+        System.out.println(
+                "1. 회원관리 \n" +
+                "2. 창고관리 \n"+
+                "3. 재무관리 \n" +
+                "4. 재고관리 \n"+
+                "5. 입고관리 \n"+
+                "6. 출고관리 \n"+
+                "7. 게시판  \n"+
+                "8. 로그아웃 \n");
+        try{
+            int sel = this.printAskNumber(br,"찾으시는 서비스를 입력하세요 :",8);
+            switch (sel){
+                case 1->funName = PrintFunctionName.PRINT_MEMBERSHIP_MANAGEMENT;
+                case 2->funName = PrintFunctionName.PRINT_WAREHOUSE_MANAGEMENT;
+                case 3->funName = PrintFunctionName.PRINT_FINANCIAL_MANAGEMENT;
+                case 4->funName = PrintFunctionName.PRINT_STOCK_MANAGEMENT;
+                case 5->funName = PrintFunctionName.PRINT_STOCKING_REQUEST_MANAGEMENT;
+                case 6->funName = PrintFunctionName.PRINT_RELEASE_MANAGEMENT;
+                case 7->funName = PrintFunctionName.PRINT_BOARD_MENU;
+                case 8->funName = PrintFunctionName.PRINT_START_MENU;
+            }
+        }catch (WrongInputNumberException e){
+            System.err.println(e.getMessage());
+            funName = PrintFunctionName.PRINT_MAIN_MENU;
+        }
+        return funName;
+    }
+    public
+
 }
