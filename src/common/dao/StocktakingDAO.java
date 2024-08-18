@@ -1,5 +1,9 @@
 package common.dao;
 
+
+import static util.Role.STORE_OPERATOR;
+
+import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import lib.ConnectionPool;
@@ -8,6 +12,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.*;
 import vo.StockVO;
+import vo.UserVO;
 
 public class StocktakingDAO {
 
@@ -17,20 +22,17 @@ public class StocktakingDAO {
   private String sql;
   private PreparedStatement pstmt;
   StockVO stock = null;
+  CallableStatement cstmt = null;
+  private UserVO userVO = null;
 
-  public StocktakingDAO(){
+  public StocktakingDAO(UserVO userVO){
     init();
+    this.userVO = userVO;
   }
 
   private void init(){
     conncp = ConnectionPool.getInstance();
   }
-
-
-  /*관리자급 재고 출력*/
-
-  //회원별 재고 목록 출력
-
 
   //대분류 재고 목록 출력
   public List<StockVO> majorStockList(int categoryId) throws SQLException, InterruptedException {
@@ -38,57 +40,26 @@ public class StocktakingDAO {
     List<StockVO> stockList = new ArrayList<StockVO>();
     this.connection = conncp.getConnection(100);
     try {
-      sql = " select *, pd.productName from stock s "
-          + " JOIN product pd ON s.productId = pd.productId  "
-          + " JOIN storage st ON s.storage_id = st.storage_id "
-          + " where productid IN "
-          + " ( select p.productid, p.productName from product p "
-          + " join (select * from small_category sm1 join "
-          + " (select * from middle_category mi join major_category ma "
-          + " on mi.majorcategoryid = ma.majorcategoryid "
-          + " where ma.majorcategoryid = ? ) AS a "
-          + " ON sm1.middle_categoryId = a.middle_categoryId) AS b "
-          + " on b.small_categoryid = p.small_categoryid )";
+      sql = " select "
+          + " s.user_id, "
+          + " s.storage_id, "
+          + " st.storage_name, "
+          + " s.product_id, "
+          + " pd.product_Name, "
+          + " s.storage_quantity "
+          + " from stock s  "
+          + " JOIN product pd ON s.product_Id = pd.product_Id  "
+          + "    JOIN storage st ON s.storage_id = st.storage_id "
+          + "    WHERE s.product_id IN "
+          + "   (select pr.product_id from product pr join "
+          + "     (select sm1.small_category_id  from small_category sm1 join "
+          + "       (select mi.middle_category_id, ma.major_category_id from middle_category mi join "
+          + "         major_category ma on mi.major_category_id = ma.major_category_id "
+          + "       where ma.major_category_id = ? ) AS a "
+          + "           ON sm1.middle_category_Id = a.middle_category_Id) AS b "
+          + "   ON b.small_category_id = pr.small_category_id)";
 
-      pstmt = connection.prepareStatement(sql);
-      pstmt.setInt(1, categoryId);
-      rs = pstmt.executeQuery();
-
-      conncp.releaseConnection(this.connection);
-
-      while(rs.next())
-
-        stock = new StockVO(
-            rs.getString("user_id"),
-            rs.getInt("storage_id"),
-            rs.getInt("product_id"),
-            rs.getInt("quantity"));
-
-      stockList.add(stock);
-
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return stockList;
-  }
-
-  //중분류 재고 목록 출력
-  public List<StockVO> middleStockList(int categoryId) throws SQLException, InterruptedException{
-
-    List<StockVO> stockList = new ArrayList<StockVO>();
-    this.connection = conncp.getConnection(100);
-
-    try {
-      sql = " select *, pd.productName from stock s "
-          + " JOIN product pd ON s.productId = pd.productId  "
-          + " JOIN storage st ON s.storage_id = st.storage_id "
-          + " where productid IN "
-          + " ( select p.productid from product p "
-          + " JOIN (select * from small_category sm1 "
-          + " JOIN middle_category mi "
-          + " ON sm1.small_categoryId = mi.small_categoryId "
-          + " WHERE mi.middle_categoryId = ?) a"
-          + " ON p.small_categoryId = a.small_categoryId) AS C ";
+      if(userVO.getRole().equals(STORE_OPERATOR))sql+= " AND user_id = "+userVO.getUserId();
 
       pstmt = connection.prepareStatement(sql);
       pstmt.setInt(1, categoryId);
@@ -98,11 +69,62 @@ public class StocktakingDAO {
 
       while(rs.next()) {
 
-        stock = new StockVO(
-            rs.getString("user_id"),
-            rs.getInt("storage_id"),
-            rs.getInt("product_id"),
-            rs.getInt("quantity"));
+        stock = new StockVO();
+        stock.setUserId(rs.getString("user_id"));
+        stock.setStorageId(rs.getInt("storage_id"));
+        stock.setStorageName(rs.getString(3));
+        stock.setProductId(rs.getInt("product_id"));
+        stock.setProductName(rs.getString(5));
+        stock.setQuantity(rs.getInt("quantity"));
+
+        stockList.add(stock);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return stockList;
+  }
+
+  //중분류 재고 목록 출력
+  public List<StockVO> middleStockList(String categoryName) throws SQLException, InterruptedException{
+
+    List<StockVO> stockList = new ArrayList<StockVO>();
+    this.connection = conncp.getConnection(100);
+
+    try {
+      sql = "select "
+          + " s.user_id, "
+          + " s.storage_id, "
+          + " st.storage_name, "
+          + " s.product_id, "
+          + " pd.product_Name, "
+          + " s.storage_quantity "
+          + " from stock s "
+          + "   JOIN product pd ON s.product_Id = pd.product_Id "
+          + "   JOIN storage st ON s.storage_id = st.storage_id "
+          + "   JOIN "
+          + " (select mi.middle_category_name from small_category sm1 "
+          + "  JOIN middle_category mi "
+          + "        ON sm1.middle_category_Id = mi.middle_category_Id "
+          + "  WHERE mi.middle_category_name = ?) a ";
+
+      if(userVO.getRole().equals(STORE_OPERATOR))sql+= " WHERE user_id = "+userVO.getUserId();
+
+      pstmt = connection.prepareStatement(sql);
+      pstmt.setString(1, categoryName);
+      rs = pstmt.executeQuery();
+
+      conncp.releaseConnection(this.connection);
+
+      while(rs.next()) {
+
+        stock = new StockVO();
+        stock.setUserId(rs.getString("user_id"));
+        stock.setStorageId(rs.getInt("storage_id"));
+        stock.setStorageName(rs.getString(3));
+        stock.setProductId(rs.getInt("product_id"));
+        stock.setProductName(rs.getString(5));
+        stock.setQuantity(rs.getInt("quantity"));
 
         stockList.add(stock);
       }
@@ -120,10 +142,19 @@ public class StocktakingDAO {
     List<StockVO> stockList = new ArrayList<StockVO>();
     this.connection = conncp.getConnection(100);
     try {
-      sql = " select *, pd.productName from stock s "
-          + " JOIN product pd ON s.productId = pd.productId  "
+      sql = "select "
+          + " s.user_id, "
+          + " s.storage_id, "
+          + " st.storage_name, "
+          + " s.product_id, "
+          + " pd.product_Name, "
+          + " s.storage_quantity "
+          + " from stock s "
+          + " JOIN product pd ON s.product_Id = pd.product_Id  "
           + " JOIN storage st ON s.storage_id = st.storage_id "
           + " where small_categoryId = ?";
+
+      if(userVO.getRole().equals(STORE_OPERATOR))sql+= " AND user_id = "+userVO.getUserId();
 
       pstmt = connection.prepareStatement(sql);
       pstmt.setInt(1, categoryId);
@@ -131,15 +162,18 @@ public class StocktakingDAO {
 
       conncp.releaseConnection(this.connection);
 
-      while(rs.next())
+      while(rs.next()) {
 
-        stock = new StockVO(
-            rs.getString("user_id"),
-            rs.getInt("storage_id"),
-            rs.getInt("product_id"),
-            rs.getInt("quantity"));
+        stock = new StockVO();
+        stock.setUserId(rs.getString("user_id"));
+        stock.setStorageId(rs.getInt("storage_id"));
+        stock.setStorageName(rs.getString(3));
+        stock.setProductId(rs.getInt("product_id"));
+        stock.setProductName(rs.getString(5));
+        stock.setQuantity(rs.getInt("quantity"));
 
-      stockList.add(stock);
+        stockList.add(stock);
+      }
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -153,25 +187,37 @@ public class StocktakingDAO {
     List<StockVO> stockList = new ArrayList<StockVO>();
     this.connection = conncp.getConnection(100);
     try {
-      sql = " select *, pd.productName from stock s "
-          + " JOIN product pd ON s.productId = pd.productId  "
+      sql = "select "
+          + " s.user_id, "
+          + " s.storage_id, "
+          + " st.storage_name, "
+          + " s.product_id, "
+          + " pd.product_Name, "
+          + " s.storage_quantity "
+          + " from stock s "
+          + " JOIN product pd ON s.product_Id = pd.product_Id  "
           + " JOIN storage st ON s.storage_id = st.storage_id "
           + " where small_categoryId = ?";
+
+      if(userVO.getRole().equals(STORE_OPERATOR))sql+= " AND user_id = "+userVO.getUserId();
 
       pstmt = connection.prepareStatement(sql);
       rs = pstmt.executeQuery();
 
       conncp.releaseConnection(this.connection);
 
-      while(rs.next())
+      while(rs.next()) {
 
-        stock = new StockVO(
-            rs.getString("user_id"),
-            rs.getInt("storage_id"),
-            rs.getInt("product_id"),
-            rs.getInt("quantity"));
+        stock = new StockVO();
+        stock.setUserId(rs.getString("user_id"));
+        stock.setStorageId(rs.getInt("storage_id"));
+        stock.setStorageName(rs.getString(3));
+        stock.setProductId(rs.getInt("product_id"));
+        stock.setProductName(rs.getString(5));
+        stock.setQuantity(rs.getInt("quantity"));
 
-      stockList.add(stock);
+        stockList.add(stock);
+      }
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -186,27 +232,71 @@ public class StocktakingDAO {
     List<StockVO> stockList = new ArrayList<StockVO>();
     this.connection = conncp.getConnection(100);
     try {
-      sql = " s.user_id, s.storage_id, s.product_name, s.quantity, pd.productName from stock s "
-          + " JOIN product pd ON s.productId = pd.productId  "
+      sql = " s.user_id, s.storage_id,st.storage_name, s.product_id, s.product_name, s.storage_quantity from stock s "
+          + " JOIN product pd ON s.product_Id = pd.product_Id  "
           + " JOIN storage st ON s.storage_id = st.storage_id "
-          + " where s.productId = %?% OR p.productName like =%?%";
+          + " where s.product_Id = %?% OR p.product_Name like =%?%";
+
+      if(userVO.getRole().equals(STORE_OPERATOR))sql+= " AND user_id = "+userVO.getUserId();
 
       pstmt = connection.prepareStatement(sql);
-      pstmt.setString(1, input);
+      pstmt.setInt(1, Integer.valueOf(input));
       pstmt.setString(2, input);
       rs = pstmt.executeQuery();
 
       conncp.releaseConnection(this.connection);
 
-      while(rs.next())
+      while(rs.next()) {
 
-        stock = new StockVO(
-            rs.getString("user_id"),
-            rs.getInt("storage_id"),
-            rs.getInt("product_id"),
-            rs.getInt("quantity"));
+        stock = new StockVO();
+        stock.setUserId(rs.getString("user_id"));
+        stock.setStorageId(rs.getInt("storage_id"));
+        stock.setStorageName(rs.getString(3));
+        stock.setProductId(rs.getInt("product_id"));
+        stock.setProductName(rs.getString(5));
+        stock.setQuantity(rs.getInt("quantity"));
 
-      stockList.add(stock);
+        stockList.add(stock);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return stockList;
+  }
+
+  //검색어+창고번호로 재고 목록 출력
+  public List<StockVO> keywordAndStorageIdStockList(int input, int storageNum) throws SQLException, InterruptedException{
+
+    List<StockVO> stockList = new ArrayList<StockVO>();
+    this.connection = conncp.getConnection(100);
+    try {
+      sql = " s.user_id, s.storage_id,st.storage_name, s.product_id, s.product_name, s.storage_quantity from stock s "
+          + " JOIN product pd ON s.productId = pd.productId  "
+          + " JOIN storage st ON s.storage_id = st.storage_id "
+          + " where s.productId = %?% "
+          + " and s.storage_id = ?";
+
+      if(userVO.getRole().equals(STORE_OPERATOR))sql+= " AND user_id = "+userVO.getUserId();
+
+      pstmt = connection.prepareStatement(sql);
+      pstmt.setInt(1, input);
+      pstmt.setInt(2, storageNum);
+      rs = pstmt.executeQuery();
+
+      conncp.releaseConnection(this.connection);
+
+      while(rs.next()) {
+
+        stock = new StockVO();
+        stock.setUserId(rs.getString("user_id"));
+        stock.setStorageId(rs.getInt("storage_id"));
+        stock.setStorageName(rs.getString(3));
+        stock.setProductId(rs.getInt("product_id"));
+        stock.setProductName(rs.getString(5));
+        stock.setQuantity(rs.getInt("quantity"));
+
+        stockList.add(stock);
+      }
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -216,7 +306,7 @@ public class StocktakingDAO {
 
 
   //창고 현황 조회
-  public void displayStorageStatus()  throws SQLException, InterruptedException{
+  public List<StockVO> displayStorageStatus()  throws SQLException, InterruptedException{
 
     List<StockVO> stockList = new ArrayList<StockVO>();
     this.connection = conncp.getConnection(100);
@@ -238,41 +328,42 @@ public class StocktakingDAO {
       conncp.releaseConnection(this.connection);
 
       while(rs.next()) {
-        int storageId = rs.getInt("창고번호");
-        String storageName = rs.getString("창고이름");
-        int storageArea = rs.getInt("창고면적");
-        String storageUsage = Integer.toString(rs.getInt("재고량"));
-        String storageUsageRate = Integer.toString(rs.getInt("창고사용량(%)"))+"%";
-
-        System.out.println("-------------------------------------------------------------------------------------------");
-        System.out.println("  창고번호      |     창고이름      |     창고면적     |    재고량     |     창고사용량(%) ");
-        System.out.println("-------------------------------------------------------------------------------------------");
-        System.out.println( storageId+"    "+storageName+"    "+storageArea+"   "+storageUsage+"    "+storageUsageRate );
-        System.out.println("-------------------------------------------------------------------------------------------");
-
+        stock = new StockVO();
+        stock.setStorageId(rs.getInt(1));
+        stock.setStorageName(rs.getString(2));
+        stock.setStorageArea(rs.getInt(3));
+        stock.setStorageUsage(rs.getInt(4));
+        stock.setStorageUsageRate(Integer.toString(rs.getInt(5))+"%");
+        stockList.add(stock);
       }
     } catch (Exception e) {
       e.printStackTrace();
     }
+    return stockList;
   }
 
   //거래처 현황 조회 displayClientStorageUsage
-  public void displayClientStorageUsage()  throws SQLException, InterruptedException{
+  public List<StockVO> displayClientStorageUsage()  throws SQLException, InterruptedException{
 
-
+    List<StockVO> stockList = new ArrayList<StockVO>();
     this.connection = conncp.getConnection(100);
     try {
-      sql = " select u.user_id as 고객번호, "
-          + " s.storage_id as 창고번호, "
-          + " st.storage_name as 창고이름 , "
-          + " storage_area as 창고면적, "
-          + " sum(s.storage_quantity)*area_per_product as 재고량 "
-          + " , round((sum(s.storage_quantity)*area_per_product / storage_area)*100,1) as '창고사용량(%)' "
-          + " from stock s "
-          + " JOIN product pd ON s.product_Id = pd.product_Id "
-          + " JOIN storage st ON s.storage_id = st.storage_id "
-          + " JOIN user u ON u.user_id = s.user_id"
-          + " group by u.user_id, s.product_id, s.storage_id";
+      sql = "  select "
+          + " s.user_id as 고객번호, "
+          + " c.contract_area as 계약면적 , "
+          + "    a.사용면적, "
+          + "    c.contract_area-a.사용면적 as '사용 가능 면적', "
+          + "    round((a.사용면적 / contract_area)*100,1) as '창고 사용량(%)' "
+          + "from stock s "
+          + " JOIN contract c ON s.user_id = c.user_id "
+          + " JOIN ( "
+          + " select  user_id, sum(s.storage_quantity*area_per_product) as '사용면적' "
+          + " from stock s join product p on s.product_id = p.product_id "
+          + " group by user_id) a ON a.user_id = s.user_id "
+          + "group by s.user_id";
+
+      cstmt = connection.prepareCall(sql);
+
 
       pstmt = connection.prepareStatement(sql);
 
@@ -281,24 +372,101 @@ public class StocktakingDAO {
       conncp.releaseConnection(this.connection);
 
       while(rs.next()) {
-        String userId = rs.getString("고객번호");
-        int storageId = rs.getInt("창고번호");
-        String storageName = rs.getString("창고이름");
-        int storageArea = rs.getInt("창고면적");
-        String storageUsage = Integer.toString(rs.getInt("재고량"));
-        String storageUsageRate = Integer.toString(rs.getInt("창고사용량(%)"))+"%";
-
-        System.out.println("-------------------------------------------------------------------------------------------------------");
-        System.out.println("  고객번호      |     창고번호      |     창고이름      |     창고면적     |    재고량     |     창고사용량(%) ");
-        System.out.println("-------------------------------------------------------------------------------------------------------");
-        System.out.println( userId+"    "+storageId+"    "+storageName+"    "+storageArea+"   "+storageUsage+"    "+storageUsageRate );
-        System.out.println("--------------------------------------------------------------------------------------------------------");
-
+        stock = new StockVO();
+        stock.setUserId(rs.getString(1));
+        stock.setStorageId(rs.getInt(2));
+        stock.setStorageName(rs.getString(3));
+        stock.setStorageArea(rs.getInt(4));
+        stock.setStorageUsage(rs.getInt(5));
+        stock.setStorageUsageRate(Integer.toString(rs.getInt(6))+"%");
+        stockList.add(stock);
       }
+
     } catch (Exception e) {
       e.printStackTrace();
     }
+    return stockList;
   }
+
+//재고 실사 수정
+public void editStockCount(int productId){
+  this.connection = conncp.getConnection(100);
+  Scanner sc = new Scanner(System.in);
+
+  try{
+    sql = " update stock "
+        + " set storage_quantity = 1000 "
+        + " where "
+        + " product_id = ? "
+        + " and storage_id = ?";
+    pstmt = connection.prepareStatement(sql);
+    System.out.println("제품 번호 입력 : ");
+    int input = sc.nextInt();
+    pstmt.setInt(1,input);
+    System.out.println("창고 번호 입력 : ");
+    int storageNum = sc.nextInt();
+    pstmt.setInt(2,storageNum);
+    pstmt.executeUpdate(sql);
+    conncp.releaseConnection(this.connection);
+
+    keywordAndStorageIdStockList(input,storageNum);
+
+  }catch (Exception e){
+    e.printStackTrace();
+  }
+
+}
+
+  //재고 삭제 수정 -> 어떤 상황에 삭제할건지? 계약 만료 or 더 이상 취급하지 않는 제품(product에서 삭제?)
+  public void deleteStockCount(int productId, int storageNum){
+    this.connection = conncp.getConnection(100);
+    Scanner sc = new Scanner(System.in);
+
+    try{
+      sql = " delete from stock "
+          + " where "
+          + " product_id = ? "
+          + " and storage_id = ?";
+      pstmt = connection.prepareStatement(sql);
+      pstmt.setInt(1,productId);
+      pstmt.setInt(2,storageNum);
+      pstmt.executeUpdate(sql);
+      conncp.releaseConnection(this.connection);
+
+      wholeStockList();
+
+    }catch (Exception e){
+      e.printStackTrace();
+    }
+
+  }
+
+  //재고 업로드
+  public void uploadStockCount(String userID, int storageId, int productId, int quantity){
+    this.connection = conncp.getConnection(100);
+    Scanner sc = new Scanner(System.in);
+
+    try{
+      sql = " INSERT INTO stock "
+          + " VALUES( "
+          + " ?, ?, ?, ? )";
+      pstmt = connection.prepareStatement(sql);
+
+      pstmt.setString(1,userID);
+      pstmt.setInt(2,storageId);
+      pstmt.setInt(3,productId);
+      pstmt.setInt(4,quantity);
+      pstmt.executeUpdate(sql);
+      conncp.releaseConnection(this.connection);
+
+      keywordStockList(Integer.toString(productId));
+
+    }catch (Exception e){
+      e.printStackTrace();
+    }
+
+  }
+
 
 
 

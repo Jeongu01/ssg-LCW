@@ -21,11 +21,11 @@ public interface StocktakingInterface {
   public void displayClientStorageUsage();
 
   /****재고 실사****/
-  public StockCountVO editStockCount(int productId);//재고 실사 수정 -> 실사 테이블 수정 + 재고 테이블에 반영시키기(반영하고 commit 안 하기)
+  public void editStockCount(int productId);//재고 실사 수정 -> 실사 테이블 수정 + 재고 테이블에 반영시키기(반영하고 commit 안 하기)
   public void deleteStockCount(int productId);//재고 실사 삭제 -> 실사 테이블에서 삭제 + 재고 테이블에 반영시키기(입력 전으로 되돌리기 - rollback)
 
   //재고 실사 등록(새제품만 등록)
-  public void uploadStockCount(int productId, String productName, int quantity);
+  public void uploadStockCount(String userID, int storageId, int productId, int quantity);
 
   /****재고 로그****/
   //재고 로그 생성

@@ -5,13 +5,15 @@ import common.dao.StocktakingDAO;
 import service.StocktakingInterface;
 import vo.StockCountVO;
 import vo.StockVO;
+import vo.UserVO;
 
 public class StocktakingImpl implements StocktakingInterface {
 
   private StocktakingDAO dao = null;
+  private UserVO userVO= null;
 
   public StocktakingImpl(){
-    dao = new StocktakingDAO();
+    dao = new StocktakingDAO(userVO);
   }
 
   /*관리자급 재고 출력*/
@@ -52,8 +54,7 @@ public class StocktakingImpl implements StocktakingInterface {
   }
 
   @Override
-  public StockCountVO editStockCount(int productId) {
-    return null;
+  public void editStockCount(int productId) {
   }
 
   @Override
@@ -62,7 +63,7 @@ public class StocktakingImpl implements StocktakingInterface {
   }
 
   @Override
-  public void uploadStockCount(int productId, String productName, int quantity) {
+  public void uploadStockCount(String userId, int storageId, int productId, int quantity) {
 
   }
 
@@ -91,4 +92,6 @@ public class StocktakingImpl implements StocktakingInterface {
 
 
   }
+
+
 }
