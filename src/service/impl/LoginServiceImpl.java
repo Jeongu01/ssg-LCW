@@ -8,17 +8,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.StringTokenizer;
 import lib.ConnectionPool;
 import service.LoginService;
-import service.MenuService;
 import threadClass.ThreadPool;
 import util.Role;
 import util.UserStatus;
-import vo.StockVO;
 import vo.UserVO;
 
 public class LoginServiceImpl implements LoginService {
@@ -84,7 +78,6 @@ public class LoginServiceImpl implements LoginService {
   public UserVO login() throws IOException, SQLException, InterruptedException {
 
     UserVO userVO = null;
-    MenuService menuService = new MenuServiceImpl();
 
     System.out.println("1.회원");
     System.out.println("2.비회원");
@@ -101,13 +94,10 @@ public class LoginServiceImpl implements LoginService {
 
         userVO = dao.selectUser(id, pwd);
 
-        menuService.showMenu(userVO);
-
         connectionPool.releaseConnection(connection);
 
         break;
       case 2:
-        menuService.showMenu(userVO);
         break;
       case 3:
         break;
