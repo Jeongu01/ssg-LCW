@@ -3,6 +3,7 @@ package vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+//집에갑시다2
 
 @Data
 @AllArgsConstructor

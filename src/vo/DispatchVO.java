@@ -17,4 +17,10 @@ public class DispatchVO {
     private String carType;
     private int maxCarry;
 
+
+    public DispatchVO(int waybillId, String carNumber, String carType) {
+        this.waybillId = waybillId;
+        this.carNumber = carNumber;
+        this.carType = carType;
+    }
 }
