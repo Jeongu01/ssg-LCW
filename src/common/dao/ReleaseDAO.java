@@ -4,10 +4,7 @@ import java.io.IOException;
 import lib.ConnectionPool;
 import service.ReleaseServiceGM;
 import service.ReleaseServiceMember;
-import vo.CarVO;
-import vo.DispatchVO;
-import vo.ReleaseVO;
-import vo.WaybillVO;
+import vo.*;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -25,11 +22,12 @@ public class ReleaseDAO implements ReleaseServiceGM, ReleaseServiceMember {
     ReleaseVO releaseVO = null;
     WaybillVO waybillVO = null;
     DispatchVO dispatchVO = null;
-    int requestId = 0;
-    int waybillId = 0;
+    private UserVO userVO = null;
+    CallableStatement cstmt = null;
 
     public ReleaseDAO(){
         this.conncp = ConnectionPool.getInstance();
+        this.userVO = userVO;
     }
 
     public boolean requestRelease() throws SQLException, InterruptedException, IOException { //출고요청
@@ -78,7 +76,7 @@ public class ReleaseDAO implements ReleaseServiceGM, ReleaseServiceMember {
         return result1;
     }
 
-    public boolean approveReleaseRequest() throws SQLException, InterruptedException, IOException { //출고승인
+    public boolean approveReleaseRequest(int requestId) throws SQLException, InterruptedException, IOException { //출고승인
 
         String query = "UPDATE delivery_request dr "
             + " JOIN stock s ON dr.product_id = s.product_id "
@@ -88,10 +86,6 @@ public class ReleaseDAO implements ReleaseServiceGM, ReleaseServiceMember {
             + " AND dr.request_quantity <= s.storage_quantity ";
 
         boolean result1 = false;
-
-        System.out.print("승인할 출고번호를 입력해주세요 : ");
-        requestId = Integer.parseInt(br.readLine());
-
 
         this.connection = conncp.getConnection(100);
 
@@ -706,7 +700,7 @@ public class ReleaseDAO implements ReleaseServiceGM, ReleaseServiceMember {
         return waybillDayList;
     }
 
-    public List<WaybillVO> selectWaybillDetail() throws IOException, SQLException { //운송장 상세보기(조회)
+    public List<WaybillVO> selectWaybillDetail(int waybillId) throws IOException, SQLException { //운송장 상세보기(조회)
         ArrayList<WaybillVO> waybillDetail = new ArrayList<WaybillVO>();
         String query = "SELECT waybill_id, delivery_request_id, depart_date, "
             + " product_id, product_name, delivery_quantity, "
@@ -714,9 +708,6 @@ public class ReleaseDAO implements ReleaseServiceGM, ReleaseServiceMember {
             + " arrive_address, arrive_address_detail, request_comment "
             + " FROM waybill "
             + " WHERE waybill_id = ? ";
-
-        System.out.print("조회할 운송장 번호를 입력해주세요 : ");
-        waybillId = Integer.parseInt(br.readLine());
 
         this.connection = conncp.getConnection(100);
 
@@ -750,7 +741,8 @@ public class ReleaseDAO implements ReleaseServiceGM, ReleaseServiceMember {
         return waybillDetail;
     }
 
-    public List<WaybillVO> selectWaybillDetailFromReleaseNo() throws SQLException, IOException { //운송장 상세보기(출고번호로 조회)
+
+    public List<WaybillVO> selectWaybillDetailFromReleaseNo(int requestId) throws SQLException, IOException { //운송장 상세보기(출고번호로 조회)
         ArrayList<WaybillVO> waybillDetail = new ArrayList<WaybillVO>();
         String query = "SELECT waybill_id, delivery_request_id, depart_date, "
             + " product_id, product_name, delivery_quantity, "
@@ -758,10 +750,6 @@ public class ReleaseDAO implements ReleaseServiceGM, ReleaseServiceMember {
             + " arrive_address, arrive_address_detail, request_comment "
             + " FROM waybill "
             + " WHERE delivery_request_id = ? ";
-
-
-        System.out.print("조회할 운송장의 출고번호를 입력해주세요 : ");
-        int waybillId = Integer.parseInt(br.readLine());
 
         this.connection = conncp.getConnection(100);
 
@@ -796,23 +784,14 @@ public class ReleaseDAO implements ReleaseServiceGM, ReleaseServiceMember {
     }
 
 
-    public boolean updateWaybill() throws IOException { //운송장 수정
+    public boolean updateWaybill(String businessName, String address, String businessTel, String arriveAddress, String arriveAddressDetail, int waybillId) throws IOException { //운송장 수정
         String query = "UPDATE waybill " +
                 "SET business_name = ?, start_address = ?, business_tel = ?, " +
                 "arrive_address = ?, arrive_address_detail = ? " +
                 "WHERE waybill_id = ?";
 
         boolean result1 = false;
-        System.out.print("수정할 사업자명 : ");
-        String businessName = br.readLine();
-        System.out.print("수정할 발송지 주소 : ");
-        String address = br.readLine();
-        System.out.print("수정할 사업자 전화번호 : ");
-        String businessTel = br.readLine();
-        System.out.print("수정할 배송지 주소 : ");
-        String arriveAddress = br.readLine();
-        System.out.print("수정할 배송지 상세주소 : ");
-        String arriveAddressDetail = br.readLine();
+
 
         this.connection = conncp.getConnection(100);
         try {
@@ -968,17 +947,20 @@ public class ReleaseDAO implements ReleaseServiceGM, ReleaseServiceMember {
         return result1;
     }
 
-    public boolean completeDelivery() throws SQLException, InterruptedException { //배송완료
-        String query = "INSERT INTO delivery_request(complete_date) VALUES(NOW())";
+    @Override
+    public boolean completeDelivery(int waybillId) throws SQLException, InterruptedException { //배송완료
+        //String query = "INSERT INTO delivery_request(complete_date) VALUES(NOW())";
+        String query = "{CALL delivery_request_proc(?,?)}";
 
         boolean result1 = false;
 
         this.connection = conncp.getConnection(100);
         try {
-            pstmt = connection.prepareStatement(query);
-
-            int result = pstmt.executeUpdate();
-            pstmt.close();
+            cstmt = connection.prepareCall(query);
+            cstmt.setString(1, userVO.getUserId());
+            cstmt.setInt(2, waybillId);
+            int result = cstmt.executeUpdate();
+            cstmt.close();
 
             if (result == 1) {
                 result1 = true;
