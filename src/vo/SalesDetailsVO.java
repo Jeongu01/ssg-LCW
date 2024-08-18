@@ -11,6 +11,6 @@ public class SalesDetailsVO {
     private int salesDetailsId;
     private Date salesDetailsDate;
     private int cost;
-    private int categoryId;
     private int warehouseId;
+    private int categoryId;
 }

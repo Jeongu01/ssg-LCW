@@ -3,10 +3,7 @@ package service.impl;
 import common.dao.FinancialManagementDAO;
 import service.FMservice;
 import service.FMserviceGM;
-import vo.ContractVO;
-import vo.ExpenditureDetailsVO;
-import vo.RevenueVO;
-import vo.SalesDetailsVO;
+import vo.*;
 
 import java.sql.Date;
 import java.util.ArrayList;
@@ -20,8 +17,8 @@ public class FinancialManagementImpl implements FMserviceGM, FMservice {
     }
 
     @Override
-    public ArrayList<ContractVO> InquiryContract(Date date) {
-        return dao.selectContracts("");
+    public ArrayList<ContractVO> InquiryContract(UserVO user) {
+        return dao.selectContracts(user);
     }
 
     @Override
@@ -40,16 +37,20 @@ public class FinancialManagementImpl implements FMserviceGM, FMservice {
     }
 
     @Override
-    public RevenueVO inquiryTotalRevenue(Date date) {
-        ArrayList<ExpenditureDetailsVO> expDetList = inquiryExpDet(null,date);
-        ArrayList<SalesDetailsVO> salDetList = inquirySalDet(null,date);
-        //do something!!
-        return null;
+    public RevenueVO inquiryTotalRevenue(UserVO user,Date begin,Date end) {
+        int expDetCost = dao.sumExpDet(user,begin,end);
+        int salDetCost = dao.sumSalDet(user,begin,end);
+        return new RevenueVO(salDetCost - expDetCost,begin,end);
     }
 
     @Override
-    public ArrayList<ExpenditureDetailsVO> inquiryExpDet(String userId, Date date) {
-        return dao.selectExpDet("");
+    public ArrayList<ContractVO> inquiryAllContract() {
+        return dao.selectAllContracts();
+    }
+
+    @Override
+    public ArrayList<ExpenditureDetailsVO> inquiryExpDet(UserVO user, Date begin,Date end) {
+        return dao.selectExpDet(user,begin,end);
     }
 
     @Override
@@ -68,15 +69,15 @@ public class FinancialManagementImpl implements FMserviceGM, FMservice {
     }
 
     @Override
-    public ArrayList<SalesDetailsVO> inquirySalDet(String userId, Date date) {
-        return dao.selectSalDet("");
+    public ArrayList<SalesDetailsVO> inquirySalDet(UserVO user, Date begin,Date end) {
+        return dao.selectSalDet(user,begin,end);
     }
 
     @Override
-    public RevenueVO inquiryRevenueByWarehouse(int warehouseId, Date date) {
-        ArrayList<ExpenditureDetailsVO> expDetList = inquiryExpDet("",date);
-        ArrayList<SalesDetailsVO> salDetList = inquirySalDet("",date);
-        //do something!!
-        return null;
+    public RevenueVO inquiryRevenueByWarehouse(UserVO user, Date begin,Date end) {
+        //여기서 관리자 총관리자를 판단해주자.
+        int expDetCost = dao.sumExpDet(user,begin,end);
+        int salDetCost = dao.sumSalDet(user,begin,end);
+        return new RevenueVO(salDetCost - expDetCost,begin,end);
     }
 }
