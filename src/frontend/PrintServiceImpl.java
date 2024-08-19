@@ -72,7 +72,7 @@ public class PrintServiceImpl {
         }
         return funName;
     }
-    public PrintFunctionName printLoginMenu(MainVO data, BufferedReader br) throws IOException {
+    public PrintFunctionName printLoginMenu(InputVO data, BufferedReader br) throws IOException {
         PrintFunctionName funName = null;
         UserVO user = data.getUser();
         System.out.println(
@@ -103,8 +103,15 @@ public class PrintServiceImpl {
         }
         return funName;
     }
+
+    public PrintFunctionName printLoginFail(){
+        PrintFunctionName funName = null;
+        System.out.println("로그인에 실패하였습니다.");
+        return funName = PrintFunctionName.EXIT;
+    }
+
     //회원가입정보 UserVo에 담아서 돌려줌=>이상한값넣었을때 예외발생시키는것도 여기서 처리하자.
-    public PrintFunctionName printJoinMembership(MainVO data, BufferedReader br) throws IOException{
+    public PrintFunctionName printJoinMembership(InputVO data, BufferedReader br) throws IOException{
         PrintFunctionName funName = null;
         UserVO user = data.getUser();
         System.out.println("회원유형");
@@ -124,9 +131,9 @@ public class PrintServiceImpl {
                 case 3->printJoinMembershipStoreEmployee(user,br);
                 case 4->printJoinMembershipDeliveryDriver(user,br);
                 case 5->printJoinMembershipSupplier(user,br);
-                case 6->printJoinMembershipWhManager(data,br);
+                case 6->printJoinMembershipWhManager(user,br);
             }
-            funName = PrintFunctionName.PRINT_START_MENU;
+            funName = PrintFunctionName.EXIT;
         }catch (WrongInputNumberException e){
             System.err.println(e.getMessage());
             funName = PrintFunctionName.PRINT_JOIN_MEMBERSHIP;
@@ -139,6 +146,12 @@ public class PrintServiceImpl {
         System.out.print("비밀번호를 입력하세요 : ");
         user.setPassword(br.readLine());
         System.out.print("이름을 입력하세요 : ");
+        user.setName(br.readLine());
+        System.out.print("생년월일을 입력하세요 : ");
+        user.setBirth(Date.valueOf(br.readLine()));
+        System.out.print("이메일을 입력하세요 : ");
+        user.setName(br.readLine());
+        System.out.print("전화번호를 입력하세요 : ");
         user.setName(br.readLine());
         System.out.print("주소를 입력하세요: ");
         user.setAddress(br.readLine());
@@ -172,12 +185,12 @@ public class PrintServiceImpl {
         user.setRole(Role.SUPPLIER);
         printJoinMembershipCommon(user,br);
     }
-    private void printJoinMembershipWhManager(MainVO data,BufferedReader br)throws IOException{
-        UserVO user = data.getUser();
+    private void printJoinMembershipWhManager(UserVO user,BufferedReader br)throws IOException{
+//        UserVO user = data.getUser();
         user.setRole(Role.WH_MANAGER);
         printJoinMembershipCommon(user,br);
-        System.out.print("관리할 창고ID를 입력하세요 : ");
-        data.setWarehouseID(Integer.parseInt(br.readLine()));
+//        System.out.print("관리할 창고ID를 입력하세요 : ");
+//        data.setWarehouseID(Integer.parseInt(br.readLine()));
     }
 
     public PrintFunctionName printFindID(String email,BufferedReader br) throws IOException{

@@ -54,6 +54,7 @@ public enum PrintFunctionName {
     PRINT_REQUEST_INPUT_ID("printRequestInputId"),
     PRINT_REQUEST_INPUT_BUSINESS_NUMBER("printRequestInputBusinessNumber"),
     PRINT_APPROVE_REGISTRATION_REQUEST("printApproveRegistrationRequest"),
+    PRINT_LOGIN_FAIL("printLoginFail"),
     EXIT("EXIT");
 
 

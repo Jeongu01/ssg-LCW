@@ -43,11 +43,9 @@ public class ThreadEx implements Runnable {
     private UserManagementServiceImpl userManagementService = new UserManagementServiceImpl();
 
     public ThreadEx() {
-        mainVO = new MainVO(new UserVO(), -1);
-        mainVO.getUser().setRole(Role.GUEST);
+        mainVO = new MainVO();
     }
 
-    @Override
     public void run() {
         // 여기다가 다 박아넣기
         try {
@@ -55,16 +53,20 @@ public class ThreadEx implements Runnable {
             functionStack.push(PrintFunctionName.PRINT_START_MENU);
             while (!functionStack.isEmpty()) {
                 PrintFunctionName nextFunction = null;
+                System.out.println(functionStack);
                 switch (functionStack.peek()) {
                     case PRINT_START_MENU -> {
                         nextFunction = printService.printStartMenu(mainVO, br);
                     } // 시작 메뉴
                     case PRINT_LOGIN_MENU -> {
-                        nextFunction = printService.printLoginMenu(mainVO, br);
-                        mainVO.setUser(loginService.login(mainVO.getUser()));
+                        nextFunction = printService.printLoginMenu(tempInput, br);
+                        mainVO.setUser(loginService.login(tempInput.getUser()));
+                        if (mainVO.getUser() == null) {   // 로그인 실패
+                            nextFunction = printService.printLoginFail();
+                        }
                     } // 로그인 메뉴
                     case PRINT_JOIN_MEMBERSHIP -> {
-                        nextFunction = printService.printJoinMembership(mainVO, br);
+                        nextFunction = printService.printJoinMembership(tempInput, br);
                         loginService.registerUser(tempInput.getUser());
                     } // 회원가입
                     case PRINT_FIND_ID -> {
@@ -79,6 +81,7 @@ public class ThreadEx implements Runnable {
                     } // 비밀번호 찾기
                     case PRINT_MAIN_MENU -> {
                         nextFunction = printService.PrintMainMenu(br);
+                        if (nextFunction.equals(PrintFunctionName.EXIT)) functionStack.pop();
                     } // 로그인 후 메인 메뉴
                     case PRINT_MEMBERSHIP_MANAGEMENT -> {
                         if (mainVO.getUser().getRole().equals(Role.ADMIN)) {  // 관리자

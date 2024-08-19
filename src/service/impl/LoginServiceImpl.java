@@ -24,13 +24,7 @@ public class LoginServiceImpl implements LoginService {
    * */
   @Override
   public UserVO login(UserVO userVO) throws IOException, SQLException, InterruptedException {
-    switch (userVO.getRole()) {
-      case GUEST:
-        break;
-      default:
-        userVO = dao.selectUser(userVO.getUserId(), userVO.getPassword());
-        break;
-    }
+    userVO = dao.selectUser(userVO.getUserId(), userVO.getPassword());
     return userVO;
   }
 
@@ -48,7 +42,7 @@ public class LoginServiceImpl implements LoginService {
    * */
   @Override
   public String findId(String email)
-          throws IOException, SQLException, InterruptedException {
+      throws IOException, SQLException, InterruptedException {
     return dao.selectUserId(email);
   }
 

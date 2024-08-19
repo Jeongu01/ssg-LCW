@@ -15,6 +15,7 @@ public class InputVO {
     Boolean check;
 
     public InputVO(){
+        user = new UserVO(null, null, null, null, null, null, null, null, null, null, null);
         product = new ProductVO(-1,null,null,-1,-1);
         warehouse = new WarehouseVO(-1,null,null,null,-1,-1,null);
         expDet = new ExpenditureDetailsVO(-1,null,-1,-1,-1);
