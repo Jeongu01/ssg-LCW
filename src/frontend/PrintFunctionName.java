@@ -29,10 +29,7 @@ public enum PrintFunctionName {
     //재무 관리 기능
     PRINT_INQUIRY_EXPDET("printInquiryExpDet"),
     PRINT_INQUIRY_SALDET("printInquirySalDet"),
-    PRINT_INQUIRY_EXPDET_BY_WH("printInquiryExpDetByWH"),
-    PRINT_INQUIRY_SALDET_BY_WH("printInquirySalDetByWH"),
     PRINT_INQUIRY_REVENUE("printInquiryRevenue"),
-    PRINT_INQUIRY_REVENUE_BY_WH("printInquiryRevenueByWH"),
     PRINT_INSERT_EXPDET("printInsertExpDet"),
     PRINT_UPDATE_EXPDET("printUpdateExpDet"),
     PRINT_DELETE_EXPDET("printDeleteExpDet"),
@@ -40,7 +37,24 @@ public enum PrintFunctionName {
     PRINT_INQUIRY_CONTRACT_BY_ID("printInquiryContractByID"),
     PRINT_INSERT_CONTRACT("printInsertContract"),
 
-
+    RESTART("restart"),
+    PRINT_SELECT_MEMBER_MENU("printSelectMemberMenu"),
+    PRINT_WAITING_MEMBER_LIST("printWaitingMemberList"),
+    PRINT_MEMBERSHIP_MANAGEMENT_FOR_ADMIN("printMembershipManagementForAdmin"),
+    PRINT_MEMBERSHIP_MANAGEMENT_FOR_MEMBER("printMembershipManagementForMember"),
+    PRINT_MEMBERSHIP_MANAGEMENT_FOR_GUEST("printMembershipManagementForGuest"),
+    PRINT_MEMBER_DETAILS("printMemberDetails"),
+    PRINT_UPDATE_MEMBER_DETAILS("printUpdateMemberDetails"),
+    PRINT_UPDATE_MEMBER_PASSWORD("printUpdateMemberPassword"),
+    PRINT_CANCEL_ACCOUNT("printCancelAccount"),
+    PRINT_MEMBER_LIST("printMemberList"),
+    PRINT_MEMBER_BY_ID("printMemberById"),
+    PRINT_MEMBER_BY_BUSINESS_NUMBER("printMemberByBusinessNumber"),
+    PRINT_CHANGE_PASSWORD_RESULT("printChangePasswordResult"),
+    PRINT_REQUEST_INPUT_ID("printRequestInputId"),
+    PRINT_REQUEST_INPUT_BUSINESS_NUMBER("printRequestInputBusinessNumber"),
+    PRINT_APPROVE_REGISTRATION_REQUEST("printApproveRegistrationRequest"),
+    EXIT("EXIT");
 
 
     private String funName;
