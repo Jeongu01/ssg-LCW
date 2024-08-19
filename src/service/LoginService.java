@@ -5,13 +5,11 @@ import java.sql.SQLException;
 import vo.UserVO;
 
 public interface LoginService {
-  public void showMenu() throws IOException, SQLException, InterruptedException;
+  public UserVO login(UserVO userVO) throws IOException, SQLException, InterruptedException;
 
-  public UserVO login() throws IOException, SQLException, InterruptedException;
+  public boolean registerUser(UserVO userVO) throws IOException;
 
-  public boolean registerUser() throws IOException;
+  public String findId(String email) throws IOException, SQLException, InterruptedException;
 
-  public String findId() throws IOException, SQLException, InterruptedException;
-
-  public String findPwd() throws IOException, SQLException, InterruptedException;
+  public String findPwd(String pwd) throws IOException, SQLException, InterruptedException;
 }
