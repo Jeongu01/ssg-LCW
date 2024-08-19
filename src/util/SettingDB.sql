@@ -18,8 +18,8 @@ CREATE TABLE user
     birth           Date         NOT NULL,
     email           varchar(30)  NOT NULL,
     tel             varchar(15)  NOT NULL,
-    role            varchar(20) NOT NULL,
-    status          varchar(20) NOT NULL,
+    role            varchar(20)  NOT NULL,
+    status          varchar(20)  NOT NULL,
     address         varchar(100) NOT NULL,
     business_name   varchar(50)  NULL,
     business_number varchar(30)  NULL,
@@ -28,12 +28,11 @@ CREATE TABLE user
 
 CREATE TABLE board
 (
-    board_id        int unsigned NOT NULL AUTO_INCREMENT,
-    title           varchar(50)  NOT NULL,
-    contents        varchar(255) NULL,
-    board_date      Date         NOT NULL,
-    user_id         varchar(20)  NULL,
-    answer_board_id int unsigned NULL,
+    board_id   int unsigned NOT NULL AUTO_INCREMENT,
+    title      varchar(50)  NOT NULL,
+    contents   varchar(255) NULL,
+    board_date Date         NOT NULL,
+    user_id    varchar(20)  NULL,
     PRIMARY KEY (board_id)
 );
 
@@ -61,7 +60,7 @@ CREATE TABLE stock
     storage_id       int unsigned NOT NULL,
     product_id       int unsigned NOT NULL,
     storage_quantity int unsigned NOT NULL,
-    PRIMARY KEY (user_id,storage_id,product_id)
+    PRIMARY KEY (user_id, storage_id, product_id)
 );
 
 CREATE TABLE storage
@@ -214,11 +213,12 @@ CREATE TABLE notice
 
 CREATE TABLE answer_board
 (
-    answer_board_id int unsigned NOT NULL AUTO_INCREMENT,
-    title           varchar(50)  NOT NULL,
-    contents        varchar(255) NULL,
-    board_date      Date         NOT NULL,
-    user_id         varchar(20)  NULL,
+    answer_board_id  int unsigned NOT NULL AUTO_INCREMENT,
+    title            varchar(50)  NOT NULL,
+    contents         varchar(255) NULL,
+    board_date       Date         NOT NULL,
+    user_id          varchar(20)  NULL,
+    inquiry_board_id int unsigned NOT NULL,
     PRIMARY KEY (answer_board_id)
 );
 
@@ -238,6 +238,7 @@ CREATE TABLE waybill
     request_comment       varchar(100) NOT NULL,
     PRIMARY KEY (waybill_id, delivery_request_id)
 );
+
 
 ALTER TABLE stock
     ADD CONSTRAINT FK_user_TO_stock_1 FOREIGN KEY (

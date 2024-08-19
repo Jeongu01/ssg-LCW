@@ -49,9 +49,8 @@ public class UserManagementDAO {
             rs.getString("business_name"),
             rs.getString("business_number"));
         userList.add(user);
-
-        pstmt.close();
       }
+      pstmt.close();
     } catch (SQLException e) {
       throw new RuntimeException(e);
     } finally {
