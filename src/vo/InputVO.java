@@ -9,4 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class InputVO {
     ProductVO product;
+    WarehouseVO warehouse;
 }
