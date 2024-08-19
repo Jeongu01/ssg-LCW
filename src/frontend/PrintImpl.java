@@ -1,9 +1,12 @@
 package frontend;
 
 import service.WMServiceGM;
+import service.impl.ReleaseServiceManagerImpl;
 import service.impl.WarehouseManagementImpl;
 import vo.WarehouseVO;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Scanner;
 
 /*일단 예시로 대충 UI 짠거야 다 바꿀예정 구조가 어떤지만 봐봐.=>이 클래스를 싱글턴으로 구현해도 좋겠네 */
@@ -36,4 +39,18 @@ public class PrintImpl {
     private void printInquiryWarehouse(WMServiceGM service,Scanner sc){
 
     }
+
+
+    //출고관리 총관리자 메서드
+
+    static ReleaseServiceManagerImpl releaseServiceManager = new ReleaseServiceManagerImpl();
+
+    public static void test() throws SQLException, IOException, InterruptedException {
+        releaseServiceManager.releaseManagerMenu();
+    }
+
+    public static void main(String[] args) throws SQLException, IOException, InterruptedException {
+        test();
+    }
+
 }

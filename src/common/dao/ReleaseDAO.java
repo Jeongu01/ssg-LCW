@@ -118,8 +118,9 @@ public class ReleaseDAO implements ReleaseServiceGM, ReleaseServiceMember {
             + " SELECT  p.product_id, p.product_name, d.request_quantity, "
             + " u.business_name, u.address, u.tel, "
             + " d.delivery_address, d.address_detail, d.request_comment "
-            + " FROM delivery_request AS d, user AS u, stock AS s, product AS p "
-            + " WHERE d.user_id = u.user_id AND u.user_id = s.user_id AND s.product_id = p.product_id";
+            + " FROM delivery_request AS d, user AS u, product AS p "
+            + " WHERE d.user_id = u.user_id AND d.product_id = p.product_id" +
+                " AND u.business_name IS NOT NULL AND u.tel IS NOT NULL";
 
         boolean result1 = false;
 
@@ -149,7 +150,11 @@ public class ReleaseDAO implements ReleaseServiceGM, ReleaseServiceMember {
     public List<ReleaseVO> selectNotApprovedReleaseList() throws SQLException, InterruptedException { //미승인 리스트
         ArrayList<ReleaseVO> notApprovedReleaseList = new ArrayList<ReleaseVO>();
 
-        String query = "SELECT d.delivery_request_id, d.user_id, d.request_date, d.product_id, p.product_name, d.request_quantity, u.address, d.delivery_address, d.address_detail FROM delivery_request AS d, user AS u, product AS p WHERE d.user_id = u.user_id AND d.product_id = p.product_id AND d.approved_date is null ORDER BY d.request_date DESC;";
+        String query = "SELECT d.delivery_request_id, d.user_id, d.request_date, d.product_id, p.product_name, " +
+                "d.request_quantity, u.address, d.delivery_address, d.address_detail FROM delivery_request AS d, user AS u, " +
+                "product AS p WHERE d.user_id = u.user_id AND d.product_id = p.product_id AND d.approved_date IS NULL " +
+                " AND u.business_name IS NOT NULL AND u.tel IS NOT NULL " +
+                " ORDER BY d.request_date DESC";
 
         this.connection = conncp.getConnection(100);
         pstmt = connection.prepareStatement(query);
@@ -707,7 +712,7 @@ public class ReleaseDAO implements ReleaseServiceGM, ReleaseServiceMember {
             + " business_name, start_address, business_tel, "
             + " arrive_address, arrive_address_detail, request_comment "
             + " FROM waybill "
-            + " WHERE waybill_id = ? ";
+            + " WHERE waybill_id = ? AND business_name IS NOT NULL AND business_tel IS NOT NULL";
 
         this.connection = conncp.getConnection(100);
 
@@ -957,7 +962,7 @@ public class ReleaseDAO implements ReleaseServiceGM, ReleaseServiceMember {
         this.connection = conncp.getConnection(100);
         try {
             cstmt = connection.prepareCall(query);
-            cstmt.setString(1, userVO.getUserId());
+            cstmt.setString(1, "user013");
             cstmt.setInt(2, waybillId);
             int result = cstmt.executeUpdate();
             cstmt.close();
