@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MainVO {
-    UserVO user;
-    int warehouseID;
+public class InputVO {
+    ProductVO product;
 }

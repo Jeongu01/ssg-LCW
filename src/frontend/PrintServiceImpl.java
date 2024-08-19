@@ -1,13 +1,17 @@
 package frontend;
 
 import exception.ExitException;
+import exception.NoPermissionException;
 import exception.WrongInputNumberException;
 import util.Role;
+import vo.InputVO;
 import vo.MainVO;
+import vo.ProductVO;
 import vo.UserVO;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 //싱글턴 : 출력 서비스 클래스
 public class PrintServiceImpl {
@@ -173,7 +177,7 @@ public class PrintServiceImpl {
         user.setRole(Role.WH_MANAGER);
         printJoinMembershipCommon(user,br);
         System.out.print("관리할 창고ID를 입력하세요 : ");
-        data.setWarehouseId(Integer.parseInt(br.readLine()));
+        data.setWarehouseID(Integer.parseInt(br.readLine()));
     }
 
     public PrintFunctionName printFindID(String email,BufferedReader br) throws IOException{
@@ -203,16 +207,17 @@ public class PrintServiceImpl {
                 "7. 게시판  \n"+
                 "8. 로그아웃 \n");
         try{
-            int sel = this.printAskNumber(br,"찾으시는 서비스를 입력하세요 :",8);
+            int sel = this.printAskNumber(br,"찾으시는 서비스를 입력하세요 :",9);
             switch (sel){
                 case 1->funName = PrintFunctionName.PRINT_MEMBERSHIP_MANAGEMENT;
                 case 2->funName = PrintFunctionName.PRINT_WAREHOUSE_MANAGEMENT;
-                case 3->funName = PrintFunctionName.PRINT_FINANCIAL_MANAGEMENT;
-                case 4->funName = PrintFunctionName.PRINT_STOCK_MANAGEMENT;
-                case 5->funName = PrintFunctionName.PRINT_STOCKING_REQUEST_MANAGEMENT;
-                case 6->funName = PrintFunctionName.PRINT_RELEASE_MANAGEMENT;
-                case 7->funName = PrintFunctionName.PRINT_BOARD_MENU;
-                case 8->funName = PrintFunctionName.PRINT_START_MENU;
+                case 3->funName = PrintFunctionName.PRINT_PRODUCT_MANAGEMENT;
+                case 4->funName = PrintFunctionName.PRINT_FINANCIAL_MANAGEMENT;
+                case 5->funName = PrintFunctionName.PRINT_STOCK_MANAGEMENT;
+                case 6->funName = PrintFunctionName.PRINT_STOCKING_REQUEST_MANAGEMENT;
+                case 7->funName = PrintFunctionName.PRINT_RELEASE_MANAGEMENT;
+                case 8->funName = PrintFunctionName.PRINT_BOARD_MENU;
+                case 9->funName = PrintFunctionName.PRINT_START_MENU;
             }
         }catch (WrongInputNumberException e){
             System.err.println(e.getMessage());
@@ -220,6 +225,117 @@ public class PrintServiceImpl {
         }
         return funName;
     }
-    public
+    /////////////////////////////////////////////회원관리 기능 관련
+    public PrintFunctionName printMembershipManagement(MainVO data,BufferedReader br){
+        PrintFunctionName funName = null;
+        System.out.flush();
+        this.printLogo();
+        return funName;
+    }
+    ///////////////////////////////////////////상품관리 기능 관련
+    public PrintFunctionName printProductManagement(MainVO data, InputVO inputData, BufferedReader br) throws IOException, NoPermissionException {
+        if(data.getUser().getRole()!=Role.ADMIN) throw new NoPermissionException();
+        ProductVO productVO = inputData.getProduct();
+        PrintFunctionName funName = null;
+        System.out.flush();
+        this.printLogo();
+        System.out.println(
+                "1. 상품등록\n"+
+                "2. 상품조회\n"+
+                "3. 뒤로가기\n");
+        try{
+            int sel = this.printAskNumber(br,"메뉴를 선택하세요 ",3);
+            switch (sel){
+                case 1 :
+                    System.out.println("[상품등록]");
+                    System.out.print("상품명 : ");
+                    productVO.setProductName(br.readLine());
+                    System.out.println("상품브랜드 : ");
+                    productVO.setProductBrand(br.readLine());
+                    System.out.println("상품 면적 : ");
+                    productVO.setAreaPerProduct(Integer.parseInt(br.readLine()));
+                    System.out.println("카테고리 ID : ");
+                    productVO.setCategoryId(Integer.parseInt(br.readLine()));
+                    break;
+                case 2:
+                    System.out.println("[상품조회]");
+                    System.out.println("상품ID|상품명|브랜드|상품면적|상품카테고리");
+
+                    break;
+                case 3:funName = PrintFunctionName.PRINT_MAIN_MENU;break;
+            }
+        }catch (WrongInputNumberException e){
+            System.err.println(e.getMessage());
+            funName = PrintFunctionName.PRINT_PRODUCT_MANAGEMENT;
+        }
+        return funName;
+    }
+    public PrintFunctionName printInquiryProducts(ArrayList<ProductVO> ret,BufferedReader br)throws IOException{
+        PrintFunctionName funName = null;
+        System.out.println("[상품조회]");
+        System.out.println("상품ID|상품명|브랜드|상품면적|상품카테고리");
+        for(ProductVO vo:ret){
+            System.out.println(
+                            vo.getProductId()+"|"+
+                            vo.getProductName()+"|"+
+                            vo.getProductBrand()+"|"+
+                            vo.getAreaPerProduct()+"|"+
+                            vo.getCategoryId()+"|"
+            );
+        }
+        System.out.println("\n1. 수정  2. 삭제  3. 뒤로가기");
+        try{
+            int sel = this.printAskNumber(br,"메뉴번호를 입력하세요: ",3);
+            switch (sel){
+                case 1:break;
+                case 2:break;
+                case 3:funName = PrintFunctionName.PRINT_PRODUCT_MANAGEMENT;break;
+            }
+        }catch (WrongInputNumberException e){
+            System.err.println(e.getMessage());
+            funName = PrintFunctionName.PRINT_INQUIRY_PRODUCTS;
+        }
+        return funName;
+    }
+    public PrintFunctionName printUpdateProduct(MainVO data,InputVO inputData,BufferedReader br){
+        return null;
+    }
+    /////////////////////////////////////////////////////창고관리 기능 관련
+    public PrintFunctionName printWarehouseManagement(MainVO data,BufferedReader br){
+        PrintFunctionName funName = null;
+        System.out.flush();
+        this.printLogo();
+        return funName;
+    }
+    public PrintFunctionName printFinancialManagement(MainVO data,BufferedReader br){
+        PrintFunctionName funName = null;
+        System.out.flush();
+        this.printLogo();
+        return funName;
+    }
+    public PrintFunctionName printStockManagement(MainVO data,BufferedReader br){
+        PrintFunctionName funName = null;
+        System.out.flush();
+        this.printLogo();
+        return funName;
+    }
+    public PrintFunctionName printStockingRequestManagement(MainVO data,BufferedReader br){
+        PrintFunctionName funName = null;
+        System.out.flush();
+        this.printLogo();
+        return funName;
+    }
+    public PrintFunctionName printReleaseManagement(MainVO data,BufferedReader br){
+        PrintFunctionName funName = null;
+        System.out.flush();
+        this.printLogo();
+        return funName;
+    }
+    public PrintFunctionName printBoardMenu(MainVO data,BufferedReader br){
+        PrintFunctionName funName = null;
+        System.out.flush();
+        this.printLogo();
+        return funName;
+    }
 
 }
