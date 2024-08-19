@@ -8,12 +8,15 @@ public enum PrintFunctionName {
     PRINT_FIND_PW("printFindPW"),
     PRINT_MAIN_MENU("printMainMenu"),
     PRINT_MEMBERSHIP_MANAGEMENT("printMembershipManagement"),
+    PRINT_PRODUCT_MANAGEMENT("printProductManagement"),
     PRINT_WAREHOUSE_MANAGEMENT("printWarehouseManagement"),
     PRINT_FINANCIAL_MANAGEMENT("printFinancialManagement"),
     PRINT_STOCK_MANAGEMENT("printStockManagement"),
     PRINT_STOCKING_REQUEST_MANAGEMENT("printStockingRequestManagement"),
     PRINT_RELEASE_MANAGEMENT("printReleaseManagement"),
     PRINT_BOARD_MENU("printBoardMenu"),
+
+    PRINT_INQUIRY_PRODUCTS("printInquiryProducts");
 
 
     private String funName;
