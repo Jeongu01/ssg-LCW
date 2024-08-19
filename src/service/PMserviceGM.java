@@ -9,8 +9,5 @@ public interface PMserviceGM {
     public void updateProduct(ProductVO data);
     public void deleteProduct(ProductVO data);
     public ArrayList<ProductVO> inquiryAllProduct();
-    public ArrayList<ProductVO> inquiryProductByCategory(String cateId);
     public ArrayList<ProductVO> inquiryProductByName(String name);
-    public ArrayList<ProductVO> inquiryProductByWarehouse(String wareId);
-
 }

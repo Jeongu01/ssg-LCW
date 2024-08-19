@@ -5,7 +5,8 @@ public enum UserStatus {
   VIP("VIP"),
   WAITING("WAITING"),
   BANNED("BANNED"),
-  DORMANT("DORMANT");
+  DORMANT("DORMANT"),
+  DENIED("DENIED");
 
   private String userStatus;
 

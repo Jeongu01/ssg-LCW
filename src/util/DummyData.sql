@@ -227,508 +227,360 @@ VALUES ('user001', 'pass001', 'John Doe', '1985-01-15', 'john.doe@example.com', 
 # Board 더미 데이터
 ########################################
 
-INSERT INTO board (board_id, title, contents, board_date, user_id, answer_board_id)
+INSERT INTO board (board_id, title, contents, board_date, user_id)
 VALUES (1, 'Welcome to the Forum!',
         'We are excited to have you here. Please introduce yourself and feel free to ask questions.',
-        '2024-01-01', 'user001', NULL),
+        '2024-01-01', 'user001'),
        (2, 'New Features Announcement',
         'We have just released some new features. Check them out and let us know what you think!',
-        '2024-01-02', 'user001', NULL),
+        '2024-01-02', 'user001'),
        (3, 'How to Get Started',
         'Here’s a guide to help you get started with our platform. We hope it’s helpful!',
-        '2024-01-03', 'user002', NULL),
+        '2024-01-03', 'user002'),
        (4, 'Community Guidelines',
         'Please read our community guidelines to ensure a positive experience for everyone.',
-        '2024-01-04', 'user002', NULL),
+        '2024-01-04', 'user002'),
        (5, 'Weekly Coding Challenge',
         'Join our weekly coding challenge to improve your skills and win exciting prizes!',
-        '2024-01-05', 'user003', NULL),
+        '2024-01-05', 'user003'),
        (6, 'Feedback on New UI',
         'We have redesigned our UI. Please provide feedback on the new look and feel.',
-        '2024-01-06', 'user003', NULL),
+        '2024-01-06', 'user003'),
        (7, 'Introduction to SQL',
         'A beginner’s guide to SQL. Learn the basics and get started with database management.',
-        '2024-01-07', 'user004', NULL),
+        '2024-01-07', 'user004'),
        (8, 'Looking for Study Groups',
-        'Anyone interested in forming a study group for web development?', '2024-01-08', 'user004',
-        NULL),
+        'Anyone interested in forming a study group for web development?', '2024-01-08', 'user004'),
        (9, 'Tech Conference Recap',
         'Here’s a recap of the latest tech conference. What did you think of the presentations?',
-        '2024-01-09', 'user005', NULL),
+        '2024-01-09', 'user005'),
        (10, 'How to Use Git',
         'A guide to using Git for version control. Share your tips and tricks here.', '2024-01-10',
-        'user005', NULL),
+        'user005'),
        (11, 'Project Management Tips',
         'Effective project management tips to help you keep your projects on track.', '2024-01-11',
-        'user006', NULL),
+        'user006'),
        (12, 'Introduction to Python',
         'Learn the basics of Python programming. A great language for beginners.', '2024-01-12',
-        'user006', NULL),
+        'user006'),
        (13, 'Upcoming Hackathon',
         'Join our upcoming hackathon! Register now and be part of the excitement.', '2024-01-13',
-        'user007', NULL),
+        'user007'),
        (14, 'Debugging Tips',
         'Struggling with bugs? Here are some tips to help you debug your code more effectively.',
-        '2024-01-14', 'user007', NULL),
+        '2024-01-14', 'user007'),
        (15, 'Database Design Best Practices',
-        'Best practices for designing a robust and scalable database.', '2024-01-15', 'user008',
-        NULL),
+        'Best practices for designing a robust and scalable database.', '2024-01-15', 'user008'),
        (16, 'Learning JavaScript',
         'A comprehensive guide to learning JavaScript. Share your progress and questions.',
-        '2024-01-16', 'user008', NULL),
+        '2024-01-16', 'user008'),
        (17, 'Web Development Trends',
         'What are the latest trends in web development? Share your thoughts and observations.',
-        '2024-01-17', 'user009', NULL),
+        '2024-01-17', 'user009'),
        (18, 'How to Improve Coding Skills',
-        'Tips and resources to help you improve your coding skills.', '2024-01-18', 'user009',
-        NULL),
+        'Tips and resources to help you improve your coding skills.', '2024-01-18', 'user009'),
        (19, 'Open Source Projects',
         'Looking for open source projects to contribute to? Here are some suggestions.',
-        '2024-01-19', 'user010', NULL),
+        '2024-01-19', 'user010'),
        (20, 'Best Development Tools',
-        'Share your favorite development tools and why you like them.', '2024-01-20', 'user010',
-        NULL),
+        'Share your favorite development tools and why you like them.', '2024-01-20', 'user010'),
        (21, 'Introduction to Docker',
         'Learn about Docker and how it can help with containerization in your projects.',
-        '2024-01-21', 'user011', NULL),
+        '2024-01-21', 'user011'),
        (22, 'Career Advice for Developers',
-        'Get career advice and tips from experienced developers.', '2024-01-22', 'user011', NULL),
+        'Get career advice and tips from experienced developers.', '2024-01-22', 'user011'),
        (23, 'Building RESTful APIs', 'Guide to building RESTful APIs for your applications.',
-        '2024-01-23', 'user012', NULL),
+        '2024-01-23', 'user012'),
        (24, 'Exploring New Frameworks',
-        'Share your experiences with new frameworks and technologies.', '2024-01-24', 'user012',
-        NULL),
+        'Share your experiences with new frameworks and technologies.', '2024-01-24', 'user012'),
        (25, 'How to Write Clean Code', 'Best practices for writing clean and maintainable code.',
-        '2024-01-25', 'user013', NULL),
+        '2024-01-25', 'user013'),
        (26, 'Understanding Algorithms',
         'A guide to understanding and implementing algorithms in your projects.', '2024-01-26',
-        'user013', NULL),
+        'user013'),
        (27, 'Developing Mobile Apps',
         'Tips and tools for developing mobile applications for iOS and Android.', '2024-01-27',
-        'user014', NULL),
+        'user014'),
        (28, 'Best Resources for Learning Programming',
         'Share your favorite resources for learning programming languages and concepts.',
-        '2024-01-28', 'user014', NULL),
+        '2024-01-28', 'user014'),
        (29, 'Introduction to Cloud Computing',
         'Learn the basics of cloud computing and how it can benefit your projects.', '2024-01-29',
-        'user015', NULL),
+        'user015'),
        (30, 'Tech Stack Essentials',
         'What essential technologies are in your tech stack? Discuss and share ideas.',
-        '2024-01-30', 'user015', NULL),
+        '2024-01-30', 'user015'),
        (31, 'Developing with Node.js', 'A guide to developing applications using Node.js.',
-        '2024-01-31', 'user001', NULL),
+        '2024-01-31', 'user001'),
        (32, 'Understanding Microservices',
         'Discuss the principles and practices of microservices architecture.', '2024-02-01',
-        'user001', NULL),
+        'user001'),
        (33, 'Effective Code Reviews',
         'Best practices for conducting effective code reviews and feedback.', '2024-02-02',
-        'user002', NULL),
+        'user002'),
        (34, 'Learning TypeScript', 'Explore the benefits of TypeScript and how to start using it.',
-        '2024-02-03', 'user002', NULL),
+        '2024-02-03', 'user002'),
        (35, 'Best Practices for API Security', 'Discuss the best practices for securing your APIs.',
-        '2024-02-04', 'user003', NULL),
+        '2024-02-04', 'user003'),
        (36, 'Getting Started with GitHub',
         'Learn how to get started with GitHub for version control and collaboration.', '2024-02-05',
-        'user003', NULL),
+        'user003'),
        (37, 'Building Scalable Systems',
-        'Tips and techniques for building scalable and efficient systems.', '2024-02-06', 'user004',
-        NULL),
+        'Tips and techniques for building scalable and efficient systems.', '2024-02-06', 'user004'),
        (38, 'Introduction to Machine Learning',
-        'A beginner’s guide to machine learning concepts and algorithms.', '2024-02-07', 'user004',
-        NULL),
+        'A beginner’s guide to machine learning concepts and algorithms.', '2024-02-07', 'user004'),
        (39, 'Creating a Personal Blog',
-        'Tips for creating and maintaining a personal blog or website.', '2024-02-08', 'user005',
-        NULL),
+        'Tips for creating and maintaining a personal blog or website.', '2024-02-08', 'user005'),
        (40, 'Exploring WebAssembly',
-        'Learn about WebAssembly and its uses in modern web development.', '2024-02-09', 'user005',
-        NULL),
+        'Learn about WebAssembly and its uses in modern web development.', '2024-02-09', 'user005'),
        (41, 'Career Paths in Tech',
         'Discuss various career paths in the technology industry and how to get started.',
-        '2024-02-10', 'user006', NULL),
+        '2024-02-10', 'user006'),
        (42, 'Starting with Vue.js',
-        'A guide to getting started with Vue.js for frontend development.', '2024-02-11', 'user006',
-        NULL),
+        'A guide to getting started with Vue.js for frontend development.', '2024-02-11', 'user006'),
        (43, 'Tips for Remote Work',
-        'Share your tips for staying productive and managing remote work.', '2024-02-12', 'user007',
-        NULL),
+        'Share your tips for staying productive and managing remote work.', '2024-02-12', 'user007'),
        (44, 'Effective Agile Practices',
-        'Discuss the principles and practices of Agile methodology.', '2024-02-13', 'user007',
-        NULL),
+        'Discuss the principles and practices of Agile methodology.', '2024-02-13', 'user007'),
        (45, 'Building a Chatbot',
         'Learn how to build and integrate chatbots into your applications.', '2024-02-14',
-        'user008', NULL),
+        'user008'),
        (46, 'Introduction to Kubernetes',
         'Explore the basics of Kubernetes and how to use it for container orchestration.',
-        '2024-02-15', 'user008', NULL),
+        '2024-02-15', 'user008'),
        (47, 'Advanced SQL Techniques',
         'Discuss advanced techniques for using SQL in complex queries and operations.',
-        '2024-02-16', 'user009', NULL),
+        '2024-02-16', 'user009'),
        (48, 'Getting Started with Swift', 'A guide to learning Swift for iOS app development.',
-        '2024-02-17', 'user009', NULL),
+        '2024-02-17', 'user009'),
        (49, 'Understanding Cloud Databases',
         'Learn about cloud databases and how they differ from traditional databases.', '2024-02-18',
-        'user010', NULL),
+        'user010'),
        (50, 'Introduction to Docker Compose',
         'Learn how to use Docker Compose for managing multi-container applications.', '2024-02-19',
-        'user010', NULL),
+        'user010'),
        (51, 'Effective UI/UX Design',
-        'Share your tips and best practices for creating effective UI/UX designs.', '2024-02-20',
-        'user011', NULL),
+        'Share your tips  for creating effective UI/UX designs.', '2024-02-20',
+        'user011'),
        (52, 'Exploring New DevOps Tools', 'Discuss new tools and technologies in the DevOps space.',
-        '2024-02-21', 'user011', NULL),
+        '2024-02-21', 'user011'),
        (53, 'Building Progressive Web Apps',
         'Learn how to create Progressive Web Apps (PWAs) and their benefits.', '2024-02-22',
-        'user012', NULL),
+        'user012'),
        (54, 'Best Practices for Code Documentation',
-        'Share your methods for documenting code effectively.', '2024-02-23', 'user012', NULL),
+        'Share your methods for documenting code effectively.', '2024-02-23', 'user012'),
        (55, 'Introduction to API Testing',
-        'Learn how to test your APIs for reliability and performance.', '2024-02-24', 'user013',
-        NULL),
+        'Learn how to test your APIs for reliability and performance.', '2024-02-24', 'user013'),
        (56, 'Tips for Debugging JavaScript',
-        'Share your strategies for debugging JavaScript applications.', '2024-02-25', 'user013',
-        NULL),
+        'Share your strategies for debugging JavaScript applications.', '2024-02-25', 'user013'),
        (57, 'Exploring Data Science', 'Discuss the basics of data science and tools for analysis.',
-        '2024-02-26', 'user014', NULL),
+        '2024-02-26', 'user014'),
        (58, 'Getting Started with Flutter',
-        'A guide to using Flutter for cross-platform app development.', '2024-02-27', 'user014',
-        NULL),
+        'A guide to using Flutter for cross-platform app development.', '2024-02-27', 'user014'),
        (59, 'Introduction to Serverless Architectures',
-        'Learn about serverless computing and its benefits.', '2024-02-28', 'user015', NULL),
+        'Learn about serverless computing and its benefits.', '2024-02-28', 'user015'),
        (60, 'Best Tools for Web Development',
         'Discuss your favorite tools and technologies for web development.', '2024-02-29',
-        'user015', NULL),
+        'user015'),
        (61, 'Security Best Practices for Web Apps',
-        'Share best practices for securing web applications.', '2024-03-01', 'user001', NULL),
+        'Share best practices for securing web applications.', '2024-03-01', 'user001'),
        (62, 'Getting Started with GraphQL',
-        'Learn the basics of GraphQL and how it differs from REST.', '2024-03-02', 'user001', NULL),
+        'Learn the basics of GraphQL and how it differs from REST.', '2024-03-02', 'user001'),
        (63, 'Tips for Effective Team Collaboration',
-        'Share tips for improving team collaboration and communication.', '2024-03-03', 'user002',
-        NULL),
+        'Share tips for improving team collaboration and communication.', '2024-03-03', 'user002'),
        (64, 'Introduction to PHP',
-        'Learn the basics of PHP and its applications in web development.', '2024-03-04', 'user002',
-        NULL),
+        'Learn the basics of PHP and its applications in web development.', '2024-03-04', 'user002'),
        (65, 'Exploring New Programming Languages',
         'Discuss new and emerging programming languages and their use cases.', '2024-03-05',
-        'user003', NULL),
+        'user003'),
        (66, 'Building a Scalable API',
-        'Tips for designing and building APIs that can scale effectively.', '2024-03-06', 'user003',
-        NULL),
+        'Tips for designing and building APIs that can scale effectively.', '2024-03-06', 'user003'),
        (67, 'How to Learn Data Structures',
-        'Share resources and strategies for learning data structures.', '2024-03-07', 'user004',
-        NULL),
+        'Share resources and strategies for learning data structures.', '2024-03-07', 'user004'),
        (68, 'Best Practices for Unit Testing',
-        'Discuss best practices for writing and managing unit tests.', '2024-03-08', 'user004',
-        NULL),
+        'Discuss best practices for writing and managing unit tests.', '2024-03-08', 'user004'),
        (69, 'Introduction to Web Development Frameworks',
         'Learn about various web development frameworks and their features.', '2024-03-09',
-        'user005', NULL),
+        'user005'),
        (70, 'Getting Started with Redux',
         'A guide to using Redux for state management in React applications.', '2024-03-10',
-        'user005', NULL),
+        'user005'),
        (71, 'Effective Time Management for Developers',
-        'Share your tips for managing time effectively as a developer.', '2024-03-11', 'user006',
-        NULL),
+        'Share your tips for managing time effectively as a developer.', '2024-03-11', 'user006'),
        (72, 'Building Responsive Websites',
         'Learn how to create websites that work well on various devices and screen sizes.',
-        '2024-03-12', 'user006', NULL),
+        '2024-03-12', 'user006'),
        (73, 'Understanding RESTful APIs',
         'Discuss the principles of RESTful APIs and how to implement them.', '2024-03-13',
-        'user007', NULL),
+        'user007'),
        (74, 'Tips for Learning New Technologies',
         'Share your strategies for learning and adapting to new technologies.', '2024-03-14',
-        'user007', NULL),
+        'user007'),
        (75, 'Exploring Machine Learning Libraries',
-        'Discuss popular machine learning libraries and frameworks.', '2024-03-15', 'user008',
-        NULL),
+        'Discuss popular machine learning libraries and frameworks.', '2024-03-15', 'user008'),
        (76, 'Introduction to Data Engineering',
-        'Learn about data engineering and its role in data management.', '2024-03-16', 'user008',
-        NULL),
+        'Learn about data engineering and its role in data management.', '2024-03-16', 'user008'),
        (77, 'Effective Remote Team Management', 'Share tips for managing remote teams effectively.',
-        '2024-03-17', 'user009', NULL),
+        '2024-03-17', 'user009'),
        (78, 'Understanding Software Architecture',
         'Discuss different software architecture patterns and their benefits.', '2024-03-18',
-        'user009', NULL),
+        'user009'),
        (79, 'Getting Started with Serverless Frameworks',
         'Explore serverless frameworks and how to use them in your projects.', '2024-03-19',
-        'user010', NULL),
+        'user010'),
        (80, 'Introduction to Automated Testing',
         'Learn about automated testing and its importance in software development.', '2024-03-20',
-        'user010', NULL),
+        'user010'),
        (81, 'Developing with Ruby on Rails', 'A guide to using Ruby on Rails for web development.',
-        '2024-03-21', 'user011', NULL),
+        '2024-03-21', 'user011'),
        (82, 'Understanding Event-Driven Programming',
         'Discuss the concepts of event-driven programming and its applications.', '2024-03-22',
-        'user011', NULL),
+        'user011'),
        (83, 'Introduction to NoSQL Databases',
         'Learn about NoSQL databases and how they differ from SQL databases.', '2024-03-23',
-        'user012', NULL),
+        'user012'),
        (84, 'Best Practices for API Design',
         'Share best practices for designing effective and user-friendly APIs.', '2024-03-24',
-        'user012', NULL),
+        'user012'),
        (85, 'Exploring Virtual Reality Technologies',
-        'Discuss the latest advancements in virtual reality technologies.', '2024-03-25', 'user013',
-        NULL),
+        'Discuss the latest advancements in virtual reality technologies.', '2024-03-25', 'user013'),
        (86, 'Getting Started with TensorFlow',
         'A guide to using TensorFlow for machine learning and AI projects.', '2024-03-26',
-        'user013', NULL),
+        'user013'),
        (87, 'Introduction to Blockchain Technology',
-        'Learn the basics of blockchain technology and its applications.', '2024-03-27', 'user014',
-        NULL),
+        'Learn the basics of blockchain technology and its applications.', '2024-03-27', 'user014'),
        (88, 'Tips for Effective Code Refactoring',
         'Share tips for refactoring code to improve readability and performance.', '2024-03-28',
-        'user014', NULL),
+        'user014'),
        (89, 'Exploring New Web Technologies',
-        'Discuss new technologies emerging in the web development space.', '2024-03-29', 'user015',
-        NULL),
+        'Discuss new technologies emerging in the web development space.', '2024-03-29', 'user015'),
        (90, 'Getting Started with Java',
-        'A beginner’s guide to Java programming and its applications.', '2024-03-30', 'user015',
-        NULL),
+        'A beginner’s guide to Java programming and its applications.', '2024-03-30', 'user015'),
        (91, 'Introduction to Reactive Programming',
         'Learn about reactive programming and its benefits in software development.', '2024-03-31',
-        'user001', NULL),
+        'user001'),
        (92, 'Effective Database Optimization',
         'Share your tips for optimizing database performance and efficiency.', '2024-04-01',
-        'user001', NULL),
+        'user001'),
        (93, 'Understanding Microservices Architecture',
         'Discuss the principles and benefits of microservices architecture.', '2024-04-02',
-        'user002', NULL),
+        'user002'),
        (94, 'Tips for Scaling Web Applications',
         'Share strategies for scaling web applications to handle more traffic.', '2024-04-03',
-        'user002', NULL),
+        'user002'),
        (95, 'Introduction to Kotlin', 'Learn about Kotlin and its use in Android development.',
-        '2024-04-04', 'user003', NULL),
+        '2024-04-04', 'user003'),
        (96, 'Best Practices for Code Optimization',
         'Discuss best practices for optimizing code performance and efficiency.', '2024-04-05',
-        'user003', NULL),
+        'user003'),
        (97, 'Exploring Emerging Technologies',
         'Discuss the latest emerging technologies and their potential impact.', '2024-04-06',
-        'user004', NULL),
+        'user004'),
        (98, 'Introduction to Data Privacy',
-        'Learn about data privacy principles and best practices.', '2024-04-07', 'user004', NULL),
+        'Learn about data privacy principles and best practices.', '2024-04-07', 'user004'),
        (99, 'Getting Started with Angular',
         'A guide to learning Angular and its features for frontend development.', '2024-04-08',
-        'user005', NULL),
+        'user005'),
        (100, 'Exploring Cloud Security',
         'Discuss strategies and best practices for securing cloud-based applications.',
-        '2024-04-09', 'user005', NULL);
+        '2024-04-09', 'user005');
 
 ########################################
 # answer_board 더미 데이터
 ########################################
 
-INSERT INTO answer_board (answer_board_id, title, contents, board_date, user_id)
+INSERT INTO answer_board (answer_board_id, title, contents, board_date, user_id, inquiry_board_id)
 VALUES (1, 'Re: Welcome to the Forum!',
         'Thank you for the warm welcome! I am excited to be here and looking forward to interacting with everyone.',
-        '2024-01-02', 'user001'),
+        '2024-01-02', 'user001', 1),
        (2, 'Re: New Features Announcement',
         'The new features look amazing! I especially like the improved search functionality.',
-        '2024-01-03', 'user001'),
+        '2024-01-03', 'user001', 2),
        (3, 'Re: How to Get Started',
         'The guide is very helpful. I have a few questions about setting up my profile. Can someone assist?',
-        '2024-01-04', 'user001'),
+        '2024-01-04', 'user001', 3),
        (4, 'Re: Community Guidelines',
         'I have read the guidelines. They seem fair and comprehensive. Looking forward to a positive experience!',
-        '2024-01-05', 'user001'),
+        '2024-01-05', 'user001', 4),
        (5, 'Re: Weekly Coding Challenge',
         'I am in for the coding challenge! Can you provide more details about the tasks involved?',
-        '2024-01-06', 'user001'),
+        '2024-01-06', 'user001', 5),
        (6, 'Re: Feedback on New UI',
         'The new UI is sleek but seems a bit confusing at first. It would be great to have a tutorial for the new layout.',
-        '2024-01-07', 'user001'),
+        '2024-01-07', 'user001', 6),
        (7, 'Re: Introduction to SQL',
         'Great introduction to SQL. I am eager to learn more about joins and subqueries.',
-        '2024-01-08', 'user001'),
+        '2024-01-08', 'user001', 7),
        (8, 'Re: Looking for Study Groups',
         'I am interested in joining a study group for web development. Please count me in!',
-        '2024-01-09', 'user001'),
+        '2024-01-09', 'user001', 8),
        (9, 'Re: Tech Conference Recap',
         'The conference was insightful! I particularly enjoyed the session on AI advancements.',
-        '2024-01-10', 'user001'),
+        '2024-01-10', 'user001', 9),
        (10, 'Re: How to Use Git',
         'Git can be tricky at first, but once you get the hang of it, it’s very powerful. I recommend checking out some tutorials.',
-        '2024-01-11', 'user001'),
+        '2024-01-11', 'user001', 10),
        (11, 'Re: Project Management Tips',
         'Great tips! I will implement some of these practices in my current project to see how they work.',
-        '2024-01-12', 'user001'),
+        '2024-01-12', 'user001', 11),
        (12, 'Re: Introduction to Python',
         'Python seems like a great language for beginners. I am excited to start learning it.',
-        '2024-01-13', 'user001'),
+        '2024-01-13', 'user001', 12),
        (13, 'Re: Upcoming Hackathon',
         'I am registering for the hackathon! It sounds like a fantastic opportunity to work on something exciting.',
-        '2024-01-14', 'user001'),
+        '2024-01-14', 'user001', 13),
        (14, 'Re: Debugging Tips',
         'Debugging can be challenging. I find that using a debugger tool really helps in finding issues quickly.',
-        '2024-01-15', 'user001'),
+        '2024-01-15', 'user001', 14),
        (15, 'Re: Database Design Best Practices',
         'Designing databases can be complex. The best practices mentioned are very useful for creating efficient schemas.',
-        '2024-01-16', 'user001'),
+        '2024-01-16', 'user001', 15),
        (16, 'Re: Learning JavaScript',
         'JavaScript is essential for web development. I am looking forward to mastering it.',
-        '2024-01-17', 'user001'),
+        '2024-01-17', 'user001', 16),
        (17, 'Re: Web Development Trends',
         'The trends are fascinating! I am particularly interested in the rise of serverless architectures.',
-        '2024-01-18', 'user001'),
+        '2024-01-18', 'user001', 17),
        (18, 'Re: How to Improve Coding Skills',
         'Improving coding skills is a continuous journey. Regular practice and learning from others are key.',
-        '2024-01-19', 'user001'),
+        '2024-01-19', 'user001', 18),
        (19, 'Re: Open Source Projects',
         'Contributing to open source projects is a great way to gain experience and collaborate with others.',
-        '2024-01-20', 'user001'),
+        '2024-01-20', 'user001', 19),
        (20, 'Re: Best Development Tools',
         'I use several of these tools myself. It would be interesting to know which ones others find most effective.',
-        '2024-01-21', 'user001'),
-       (21, 'Re: Introduction to Docker',
+        '2024-01-21', 'user001', 20),
+       (21, 'Re: Welcome to the Forum!',
         'Docker is a game changer for containerization. I am interested in learning more about its advanced features.',
-        '2024-01-22', 'user001'),
-       (22, 'Re: Career Advice for Developers',
+        '2024-01-22', 'user001', 1),
+       (22, 'Re: New Features Announcement',
         'Career advice is always valuable. Networking and continuous learning are essential for career growth.',
-        '2024-01-23', 'user001'),
-       (23, 'Re: Building RESTful APIs',
+        '2024-01-23', 'user001',2 ),
+       (23, 'Re: How to Get Started',
         'RESTful APIs are fundamental for modern web services. I appreciate the insights shared in this post.',
-        '2024-01-24', 'user001'),
-       (24, 'Re: Exploring New Frameworks',
+        '2024-01-24', 'user001', 3),
+       (24, 'Re: Community Guidelines',
         'Trying out new frameworks can be exciting. I am currently exploring a few myself.',
-        '2024-01-25', 'user001'),
-       (25, 'Re: How to Write Clean Code',
+        '2024-01-25', 'user001', 4),
+       (25, 'Re: Weekly Coding Challenge',
         'Writing clean code is crucial for maintainability. The tips provided are quite useful.',
-        '2024-01-26', 'user001'),
-       (26, 'Re: Understanding Algorithms',
+        '2024-01-26', 'user001', 5),
+       (26, 'Re: Feedback on New UI',
         'Algorithms are at the heart of programming. I am looking forward to learning more about different algorithms.',
-        '2024-01-27', 'user001'),
-       (27, 'Re: Developing Mobile Apps',
+        '2024-01-27', 'user001', 6),
+       (27, 'Re: Introduction to SQL',
         'Mobile app development has its challenges. The tips shared here are a great starting point.',
-        '2024-01-28', 'user001'),
-       (28, 'Re: Best Resources for Learning Programming',
+        '2024-01-28', 'user001', 7),
+       (28, 'Re: Looking for Study Groups',
         'There are so many resources available. It’s great to have a list of recommended ones.',
-        '2024-01-29', 'user001'),
-       (29, 'Re: Introduction to Cloud Computing',
+        '2024-01-29', 'user001', 8),
+       (29, 'Re: Tech Conference Recap',
         'Cloud computing is transforming IT. I am keen to understand its various deployment models.',
-        '2024-01-30', 'user001'),
-       (30, 'Re: Tech Stack Essentials',
+        '2024-01-30', 'user001', 9),
+       (30, 'Re: How to Use Git',
         'A well-chosen tech stack is crucial for any project. It’s useful to compare different stacks and their benefits.',
-        '2024-01-31', 'user001');
+        '2024-01-31', 'user001', 10);
 
-# board 와 answer_board 매칭
-
-UPDATE board
-SET answer_board_id = 1
-WHERE board_id = 1;
-
-UPDATE board
-SET answer_board_id = 2
-WHERE board_id = 2;
-
-UPDATE board
-SET answer_board_id = 3
-WHERE board_id = 3;
-
-UPDATE board
-SET answer_board_id = 4
-WHERE board_id = 4;
-
-UPDATE board
-SET answer_board_id = 5
-WHERE board_id = 5;
-
-UPDATE board
-SET answer_board_id = 6
-WHERE board_id = 6;
-
-UPDATE board
-SET answer_board_id = 7
-WHERE board_id = 7;
-
-UPDATE board
-SET answer_board_id = 8
-WHERE board_id = 8;
-
-UPDATE board
-SET answer_board_id = 9
-WHERE board_id = 9;
-
-UPDATE board
-SET answer_board_id = 10
-WHERE board_id = 10;
-
-UPDATE board
-SET answer_board_id = 11
-WHERE board_id = 11;
-
-UPDATE board
-SET answer_board_id = 12
-WHERE board_id = 12;
-
-UPDATE board
-SET answer_board_id = 13
-WHERE board_id = 13;
-
-UPDATE board
-SET answer_board_id = 14
-WHERE board_id = 14;
-
-UPDATE board
-SET answer_board_id = 15
-WHERE board_id = 15;
-
-UPDATE board
-SET answer_board_id = 16
-WHERE board_id = 16;
-
-UPDATE board
-SET answer_board_id = 17
-WHERE board_id = 17;
-
-UPDATE board
-SET answer_board_id = 18
-WHERE board_id = 18;
-
-UPDATE board
-SET answer_board_id = 19
-WHERE board_id = 19;
-
-UPDATE board
-SET answer_board_id = 20
-WHERE board_id = 20;
-
-UPDATE board
-SET answer_board_id = 21
-WHERE board_id = 21;
-
-UPDATE board
-SET answer_board_id = 22
-WHERE board_id = 22;
-
-UPDATE board
-SET answer_board_id = 23
-WHERE board_id = 23;
-
-UPDATE board
-SET answer_board_id = 24
-WHERE board_id = 24;
-
-UPDATE board
-SET answer_board_id = 25
-WHERE board_id = 25;
-
-UPDATE board
-SET answer_board_id = 26
-WHERE board_id = 26;
-
-UPDATE board
-SET answer_board_id = 27
-WHERE board_id = 27;
-
-UPDATE board
-SET answer_board_id = 28
-WHERE board_id = 28;
-
-UPDATE board
-SET answer_board_id = 29
-WHERE board_id = 29;
-
-UPDATE board
-SET answer_board_id = 30
-WHERE board_id = 30;
 
 ########################################
 # product 더미 데이터

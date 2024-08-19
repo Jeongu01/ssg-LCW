@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.Queue;
-//희원주석테스트2
 
 public class ConnectionPool {
     private String url;
@@ -27,7 +26,10 @@ public class ConnectionPool {
     //싱글턴,멀티 환경인 경우 syn키워드로 한놈씩 접근하게 해야댐
     public static synchronized ConnectionPool getInstance(){
         if(instance == null){
-            instance = new ConnectionPool("","","",5);
+            instance = new ConnectionPool("jdbc:mysql://localhost:3306/lcwmsdb?characterEncoding=UTF-8&serverTimezone=UTC",
+                    "root",
+                    "1234",
+                    5);
         }
         return instance;
     }
