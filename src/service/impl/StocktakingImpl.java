@@ -1,9 +1,9 @@
 package service.impl;
 
+import java.sql.SQLException;
 import java.util.List;
 import common.dao.StocktakingDAO;
 import service.StocktakingInterface;
-import vo.StockCountVO;
 import vo.StockVO;
 import vo.UserVO;
 
@@ -16,36 +16,30 @@ public class StocktakingImpl implements StocktakingInterface {
     dao = new StocktakingDAO(userVO);
   }
 
-  /*관리자급 재고 출력*/
-  //전체 재고 목록 출력
-  //카테고리별 재고 목록 출력
-  //검색어로 재고 목록 출력
-  //회원별 재고 목록 출력
-
 
   @Override
-  public List<StockVO> wholeStockList() {
-    return List.of();
+  public List<StockVO> wholeStockList() throws SQLException, InterruptedException {
+    return dao.wholeStockList();
   }
 
   @Override
-  public List<StockVO> majorStockList(int categoryId) {
-    return List.of();
+  public List<StockVO> majorStockList(String categoryName) throws SQLException, InterruptedException {
+    return dao.majorStockList(categoryName);
   }
 
   @Override
-  public List<StockVO> middleStockList(int categoryId) {
-    return List.of();
+  public List<StockVO> middleStockList(String categoryName) throws SQLException, InterruptedException {
+    return dao.middleStockList(categoryName);
   }
 
   @Override
-  public List<StockVO> smallStockList(int categoryId) {
-    return List.of();
+  public List<StockVO> smallStockList(String categoryName) throws SQLException, InterruptedException {
+    return dao.smallStockList(categoryName);
   }
 
   @Override
-  public List<StockVO> keywordStockList(String keyword) {
-    return List.of();
+  public List<StockVO> keywordStockList(String keyword) throws SQLException, InterruptedException {
+    return dao.keywordStockList(keyword);
   }
 
   @Override
@@ -54,43 +48,34 @@ public class StocktakingImpl implements StocktakingInterface {
   }
 
   @Override
-  public void editStockCount(int productId) {
+  public List<StockVO> keywordAndStorageIdStockList(int input, int storageNum) throws SQLException, InterruptedException {
+    return dao.keywordAndStorageIdStockList(input, storageNum);
   }
 
   @Override
-  public void deleteStockCount(int productId) {
+  public void editStockCount(int productId) {
+    dao.editStockCount(productId);
+  }
 
+  @Override
+  public void deleteStockCount(int productId, int storageNum) {
+    dao.deleteStockCount(productId, storageNum);
   }
 
   @Override
   public void uploadStockCount(String userId, int storageId, int productId, int quantity) {
+    dao.uploadStockCount(userId, storageId, productId, quantity);
+  }
 
+
+  @Override
+  public List<StockVO> displayStorageStatus() throws SQLException, InterruptedException {
+    return dao.displayStorageStatus();
   }
 
   @Override
-  public void minusStock(boolean result) {
-
-  }
-
-  @Override
-  public void plusStock(boolean result) {
-
-  }
-
-  @Override
-  public void displayStorageStatus() {
-
-  }
-
-  @Override
-  public void displayClientStorageUsage() {
-
-  }
-
-  @Override
-  public void createStockLog() {
-
-
+  public List<StockVO> displayClientStorageUsage() throws SQLException, InterruptedException {
+    return dao.displayClientStorageUsage();
   }
 
 

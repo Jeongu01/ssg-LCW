@@ -28,7 +28,7 @@ public class ConnectionPool {
         if(instance == null){
             instance = new ConnectionPool("jdbc:mysql://localhost:3306/lcwmsdb?characterEncoding=UTF-8&serverTimezone=UTC",
                     "root",
-                    "1234",
+                    "mysql1234",
                     5);
         }
         return instance;

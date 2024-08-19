@@ -1794,7 +1794,7 @@ public class ReleaseServiceImpl {
 
 
     public static void main(String[] args) throws SQLException, IOException, InterruptedException {
-        releaseDriverMenu();
+        releaseManagerMenu();
     }
 
 }
