@@ -28,6 +28,7 @@ public class StockVO {
 
   private int storageArea;
   private int storageUsage;
+  private int usableStorageArea;
   private String storageUsageRate;
 
 
