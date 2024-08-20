@@ -1,6 +1,7 @@
 package service.impl;
 
 import common.dao.ReleaseDAO;
+import frontend.PrintFunctionName;
 import vo.CarVO;
 import vo.DispatchVO;
 import vo.ReleaseVO;
@@ -22,7 +23,7 @@ public class ReleaseServiceMemberImpl {
      *  회원 기능 구현
      */
 
-    public static void releaseMemberMenu() throws IOException, SQLException, InterruptedException {
+    public static PrintFunctionName releaseMemberMenu() throws IOException, SQLException, InterruptedException {
 
         System.out.println("[출고 메뉴]");
         System.out.println(
@@ -39,9 +40,9 @@ public class ReleaseServiceMemberImpl {
             releaseManageMember();
         } else if (selNo == 3) {
             searchWaybillMember();
-        } else {
-            //메인메뉴 탭으로 이동
         }
+
+        return PrintFunctionName.EXIT;
 
     } //회원 메인메뉴
 
@@ -613,10 +614,10 @@ public class ReleaseServiceMemberImpl {
 
 
 
-    public static void main(String[] args) throws SQLException, IOException, InterruptedException {
-
-        releaseMemberMenu();
-
-    }
+//    public static void main(String[] args) throws SQLException, IOException, InterruptedException {
+//
+//        releaseMemberMenu();
+//
+//    }
 
 }

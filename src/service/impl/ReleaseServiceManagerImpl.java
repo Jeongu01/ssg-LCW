@@ -1,6 +1,7 @@
 package service.impl;
 
 import common.dao.ReleaseDAO;
+import frontend.PrintFunctionName;
 import vo.CarVO;
 import vo.DispatchVO;
 import vo.ReleaseVO;
@@ -21,7 +22,7 @@ public class ReleaseServiceManagerImpl {
     /*
      *  관리자 기능 구현
      */
-    public static void releaseManagerMenu() throws IOException, SQLException, InterruptedException {
+    public static PrintFunctionName releaseManagerMenu() throws IOException, SQLException, InterruptedException {
 
         System.out.println("[출고 메뉴]");
         System.out.println(
@@ -42,9 +43,9 @@ public class ReleaseServiceManagerImpl {
             dispatchManage();
         } else if (selNo == 5) {
             carManage();
-        } else {
-            //메인메뉴 탭으로 이동
         }
+
+        return PrintFunctionName.EXIT;
 
     } //관리자 메인메뉴
 

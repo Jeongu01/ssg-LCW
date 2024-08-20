@@ -51,6 +51,9 @@ public class ThreadEx implements Runnable {
     // 여기다가 다 박아넣기
     PrintServiceImpl printService = PrintServiceImpl.getInstance();
     functionStack.push(PrintFunctionName.PRINT_START_MENU);
+    System.out.println("-".repeat(63));
+    printService.printLogo();
+    System.out.println("-".repeat(63));
     while (!functionStack.isEmpty()) {
       PrintFunctionName nextFunction = null;
       try {
@@ -189,11 +192,12 @@ public class ThreadEx implements Runnable {
             nextFunction = printService.printDeleteWarehouse(tempInput, br);
             service.deleteWarehouse(tempInput.getWarehouse());
           }
-          //재무
-                    /*case PRINT_FINANCIAL_MANAGEMENT ->{
-
-                    }
-                    case PRINT_INQUIRY_REVENUE->{}
+          //재무, 게시판
+          case PRINT_FINANCIAL_MANAGEMENT, PRINT_BOARD_MENU -> {
+            System.out.println("다음 버전에 업데이트 됩니다.");
+            nextFunction = PrintFunctionName.EXIT;
+          }
+                    /*case PRINT_INQUIRY_REVENUE->{}
                     case PRINT_INQUIRY_EXPDET->{}
                     case PRINT_INQUIRY_SALDET->{}
                     case PRINT_INSERT_EXPDET ->{}
@@ -225,8 +229,44 @@ public class ThreadEx implements Runnable {
             nextFunction = printService.printDeleteProduct(tempInput, br);
             service.deleteProduct(tempInput.getProduct());
           }
-
-          default -> nextFunction = PrintFunctionName.RESTART;
+          //출고
+          case PRINT_RELEASE_MANAGEMENT -> {
+            switch (mainVO.getUser().getRole()) {
+              case ADMIN, WH_MANAGER ->
+                  nextFunction = ReleaseServiceManagerImpl.releaseManagerMenu();
+              case STORE_OPERATOR -> nextFunction = ReleaseServiceMemberImpl.releaseMemberMenu();
+              case DELIVERY_DRIVER -> {
+                ReleaseServiceDriverImpl releaseServiceDriver = new ReleaseServiceDriverImpl(
+                    mainVO.getUser());
+                nextFunction = releaseServiceDriver.releaseDriverMenu();
+              }
+              default -> throw new NoPermissionException();
+            }
+          }
+          //입고
+          case PRINT_STOCKING_REQUEST_MANAGEMENT -> {
+            switch (mainVO.getUser().getRole()) {
+              case ADMIN, WH_MANAGER ->
+                  nextFunction = StockingRequestManagerImpl.stockingRequestManagerMenu();
+              case STORE_OPERATOR ->
+                  nextFunction = StockingRequestMemberImpl.stockingRequestMemberMenu();
+              default -> throw new NoPermissionException();
+            }
+          }
+          case PRINT_STOCK_MANAGEMENT -> {
+            switch (mainVO.getUser().getRole()) {
+              case ADMIN, WH_MANAGER -> {
+                StocktakingImpl stocktaking = new StocktakingImpl(mainVO.getUser());
+                nextFunction = stocktaking.stockMenu();
+              }
+              case STORE_OPERATOR -> {
+                StocktakingImplForMember stocktakingImplForMember = new StocktakingImplForMember(
+                    mainVO.getUser());
+                nextFunction = stocktakingImplForMember.stockMenu();
+              }
+              default -> throw new NoPermissionException();
+            }
+          }
         }
         if (PrintFunctionName.EXIT.equals(nextFunction)) {
           functionStack.pop();
@@ -234,9 +274,8 @@ public class ThreadEx implements Runnable {
           functionStack.push(nextFunction);
         }
       } catch (IOException e) {
-
+        System.out.println(e.getMessage());
       } catch (NoPermissionException e) {
-        System.out.println(nextFunction);
         functionStack.pop();
         System.out.println(e.getMessage());
       } catch (SQLException e) {
@@ -245,22 +284,14 @@ public class ThreadEx implements Runnable {
         System.out.println(e.getMessage());
       } catch (InterruptedException e) {
         System.out.println(e.getMessage());
-//      } catch (Exception e) {
-//        System.out.println(e.getMessage());
-      } catch (NumberFormatException e) {
-        System.out.println("잘못된 입력입니다.");
+      } finally {
+        for (int i = 0; i < 30; i++) {
+          System.out.println();
+        }
+        System.out.println("-".repeat(63));
+        printService.printLogo();
+        System.out.println("-".repeat(63));
       }
     }
-//    } catch (IOException e) {
-//      throw new RuntimeException(e);
-//    } catch (ExitException e) {
-//      throw new RuntimeException(e);
-//    } catch (SQLException e) {
-//      throw new RuntimeException(e);
-//    } catch (InterruptedException e) {
-//      throw new RuntimeException(e);
-//    } catch (NoPermissionException e) {
-//      throw new RuntimeException(e);
-//    }
   }
 }

@@ -1,9 +1,11 @@
 package service.impl;
 
 import common.dao.ReleaseDAO;
+import frontend.PrintFunctionName;
 import vo.CarVO;
 import vo.DispatchVO;
 import vo.ReleaseVO;
+import vo.UserVO;
 import vo.WaybillVO;
 
 import java.io.BufferedReader;
@@ -16,13 +18,17 @@ public class ReleaseServiceDriverImpl {
 
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static ReleaseDAO releaseDAO = new ReleaseDAO();
+    private static UserVO user = null;
 
     /*
      *  운송기사 기능 구현
      */
 
-    public static void releaseDriverMenu() throws IOException, SQLException, InterruptedException { //운송기사 메인메뉴
+    public ReleaseServiceDriverImpl(UserVO userVO) {
+        user = userVO;
+    }
 
+    public static PrintFunctionName releaseDriverMenu() throws IOException, SQLException, InterruptedException { //운송기사 메인메뉴
         System.out.println("[출고 메뉴]");
         System.out.println(
                 "-----------------------------------------------------------------------------------------------------------------------------------------------");
@@ -36,9 +42,8 @@ public class ReleaseServiceDriverImpl {
             searchWaybillDriver();
         } else if (selNo == 2) {
             carManageDriver();
-        } else if (selNo == 3) {
-            //메인메뉴로 나가기
         }
+        return PrintFunctionName.EXIT;
 
     } //운송기사 메인메뉴
 
@@ -135,7 +140,7 @@ public class ReleaseServiceDriverImpl {
                     selNo = Integer.parseInt(br.readLine());
 
                     if(selNo == 1) {
-                        releaseDAO.completeDelivery(waybillId);
+                        releaseDAO.completeDelivery(user, waybillId);
                     } else if (selNo == 2){
                         releaseDriverMenu();
                     }
@@ -199,7 +204,7 @@ public class ReleaseServiceDriverImpl {
                     selNo = Integer.parseInt(br.readLine());
 
                     if(selNo == 1) {
-                        releaseDAO.completeDelivery(waybillId);
+                        releaseDAO.completeDelivery(user, waybillId);
                     } else if (selNo == 2){
                         releaseDriverMenu();
                     }
@@ -263,7 +268,7 @@ public class ReleaseServiceDriverImpl {
                     selNo = Integer.parseInt(br.readLine());
 
                     if(selNo == 1) {
-                        releaseDAO.completeDelivery(waybillId);
+                        releaseDAO.completeDelivery(user, waybillId);
                     } else if (selNo == 2){
                         releaseDriverMenu();
                     }
@@ -304,7 +309,7 @@ public class ReleaseServiceDriverImpl {
             selNo = Integer.parseInt(br.readLine());
 
             if(selNo == 1) {
-                releaseDAO.completeDelivery(waybillId);
+                releaseDAO.completeDelivery(user, waybillId);
             } else if (selNo == 2){
                 releaseDriverMenu();
             }
@@ -352,8 +357,8 @@ public class ReleaseServiceDriverImpl {
 
 
 
-    public static void main(String[] args) throws SQLException, IOException, InterruptedException {
-        releaseDriverMenu();
-    }
+//    public static void main(String[] args) throws SQLException, IOException, InterruptedException {
+//        releaseDriverMenu();
+//    }
 
 }

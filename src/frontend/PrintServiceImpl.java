@@ -220,8 +220,8 @@ public class PrintServiceImpl {
     }
     public PrintFunctionName PrintMainMenu(BufferedReader br)throws IOException{
         PrintFunctionName funName = null;
-        System.out.flush();
-        this.printLogo();
+        
+        
         System.out.println(
                 "1. 회원관리 \n" +
                 "2. 창고관리 \n"+
@@ -297,8 +297,8 @@ public class PrintServiceImpl {
 
     public PrintFunctionName printMemberList(ArrayList<UserVO> userList, String whatList, BufferedReader br) throws IOException{
         PrintFunctionName funName = null;
-        System.out.flush();
-        this.printLogo();
+        
+        
         System.out.println(
                 "--------------------------------------------------------------------------------------------------------");
         System.out.printf("%-20s\t%-20s\t%-20s\t%-20s\t%-20s\t%-20s\n", "사용자ID", "이름", "권한", "상태", "사업자명",
@@ -331,8 +331,8 @@ public class PrintServiceImpl {
 
     public PrintFunctionName printApproveRegistrationRequest(InputVO data, BufferedReader br) throws IOException{
         PrintFunctionName funName = null;
-        System.out.flush();
-        this.printLogo();
+        
+        
         System.out.println("승인 처리를 진행할 아이디를 입력하세요");
         data.getUser().setUserId(br.readLine());
         System.out.println("승인하시겠습니까? (Y/N)");
@@ -514,8 +514,8 @@ public class PrintServiceImpl {
         if(data.getUser().getRole()!=Role.ADMIN) throw new NoPermissionException();
         ProductVO productVO = inputData.getProduct();
         PrintFunctionName funName = null;
-        System.out.flush();
-        this.printLogo();
+        
+        
         System.out.println(
             "1. 상품등록\n"+
                 "2. 상품조회\n"+
@@ -602,8 +602,8 @@ public class PrintServiceImpl {
     public PrintFunctionName printWarehouseManagement(MainVO data,BufferedReader br) throws NoPermissionException,IOException {
         Role r = data.getUser().getRole();
         PrintFunctionName funName = null;
-        System.out.flush();
-        this.printLogo();
+        
+        
         System.out.println("[창고 관리]");
         try {
             int sel;
@@ -726,8 +726,8 @@ public class PrintServiceImpl {
     public PrintFunctionName printFinancialManagement(MainVO data,BufferedReader br) throws IOException, NoPermissionException {
         Role r = data.getUser().getRole();
         PrintFunctionName funName = null;
-        System.out.flush();
-        this.printLogo();
+        
+        
         System.out.println("[재무 관리]");
         try {
             int sel;
@@ -888,29 +888,29 @@ public class PrintServiceImpl {
     /////////////////////////////////////////////////////재고관리
     public PrintFunctionName printStockManagement(MainVO data,BufferedReader br){
         PrintFunctionName funName = null;
-        System.out.flush();
-        this.printLogo();
+        
+        
         return funName;
     }
     //////////////////////////////////////////////////입고관리
     public PrintFunctionName printStockingRequestManagement(MainVO data,BufferedReader br){
         PrintFunctionName funName = null;
-        System.out.flush();
-        this.printLogo();
+        
+        
         return funName;
     }
     ////////////////////////////////////////////////출고관리
     public PrintFunctionName printReleaseManagement(MainVO data,BufferedReader br){
         PrintFunctionName funName = null;
-        System.out.flush();
-        this.printLogo();
+        
+        
         return funName;
     }
     /////////////////////////////////////////////게시판메뉴관리
     public PrintFunctionName printBoardMenu(MainVO data,BufferedReader br){
         PrintFunctionName funName = null;
-        System.out.flush();
-        this.printLogo();
+        
+        
         return funName;
     }
 

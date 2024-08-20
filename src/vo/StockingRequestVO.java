@@ -16,7 +16,7 @@ public class StockingRequestVO {
   private String userId;
   private int productId;
   private int storageId;
-  private Date requestDate;
+  private Date requestId;
   private Date approvedDate;
   private Date completeDate;
   private int requestQuantity;

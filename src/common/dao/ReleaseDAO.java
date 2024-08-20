@@ -953,7 +953,7 @@ public class ReleaseDAO implements ReleaseServiceGM, ReleaseServiceMember {
     }
 
     @Override
-    public boolean completeDelivery(int waybillId) throws SQLException, InterruptedException { //배송완료
+    public boolean completeDelivery(UserVO user, int waybillId) throws SQLException, InterruptedException { //배송완료
         //String query = "INSERT INTO delivery_request(complete_date) VALUES(NOW())";
         String query = "{CALL delivery_request_proc(?,?)}";
 
@@ -962,7 +962,7 @@ public class ReleaseDAO implements ReleaseServiceGM, ReleaseServiceMember {
         this.connection = conncp.getConnection(100);
         try {
             cstmt = connection.prepareCall(query);
-            cstmt.setString(1, "user013");
+            cstmt.setString(1, user.getUserId());
             cstmt.setInt(2, waybillId);
             int result = cstmt.executeUpdate();
             cstmt.close();

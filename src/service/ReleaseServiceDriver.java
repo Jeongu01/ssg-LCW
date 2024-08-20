@@ -18,7 +18,7 @@ public interface ReleaseServiceDriver {
     public List<CarVO> selectCarAllList() throws SQLException; //차량 조회(전체 조회)
     public boolean registerCar() throws SQLException, InterruptedException, IOException; //차량 등록
     public boolean updateCar() throws SQLException, InterruptedException, IOException; // 차량 수정
-    public boolean completeDelivery(int waybillId) throws SQLException, InterruptedException; //배송 완료
+    public boolean completeDelivery(UserVO user, int waybillId) throws SQLException, InterruptedException; //배송 완료
 
 
 }
