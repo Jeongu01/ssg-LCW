@@ -41,10 +41,10 @@ public class PrintServiceImpl {
         + " ▐██████     █████▌       █     █       ▐█       █▌    ▐█████▌");
     }
 
-    private int printAskNumber(BufferedReader br, String message,int range) throws IOException, WrongInputNumberException {
+    private int printAskNumber(BufferedReader br, String message,int range) throws IOException, WrongInputNumberException, NumberFormatException {
         System.out.print(message);
         int sel = Integer.parseInt(br.readLine());
-        if(sel<=0&&sel>range) throw new WrongInputNumberException();
+        if(sel<=0||sel>range) throw new WrongInputNumberException();
         return sel;
     }
     public PrintFunctionName printStartMenu(MainVO data,BufferedReader br) throws IOException, ExitException{
@@ -64,10 +64,10 @@ public class PrintServiceImpl {
                 case 2-> funName = PrintFunctionName.PRINT_JOIN_MEMBERSHIP;
                 case 3-> funName = PrintFunctionName.PRINT_FIND_ID;
                 case 4-> funName = PrintFunctionName.PRINT_FIND_PW;
-                case 5-> throw new ExitException();
+                case 5-> funName = PrintFunctionName.EXIT;
             }
-        }catch (WrongInputNumberException e){
-            System.err.println(e.getMessage());
+        }catch (WrongInputNumberException | NumberFormatException e){
+            System.out.println("잘못된 입력입니다.");
             funName =  PrintFunctionName.PRINT_START_MENU;
         }
         return funName;
@@ -94,7 +94,7 @@ public class PrintServiceImpl {
                     funName = PrintFunctionName.PRINT_MAIN_MENU;
                     break;
                 case 3:
-                    funName = PrintFunctionName.PRINT_START_MENU;
+                    funName = PrintFunctionName.EXIT;
                     break;
             }
         }catch (WrongInputNumberException e){
@@ -140,7 +140,7 @@ public class PrintServiceImpl {
         }
         return funName;
     }
-    private void printJoinMembershipCommon(UserVO user,BufferedReader br)throws IOException{
+    private void printJoinMembershipCommon(UserVO user,BufferedReader br) throws IOException{
         System.out.print("ID를 입력하세요 : ");
         user.setUserId(br.readLine());
         System.out.print("비밀번호를 입력하세요 : ");
@@ -150,9 +150,9 @@ public class PrintServiceImpl {
         System.out.print("생년월일을 입력하세요 : ");
         user.setBirth(Date.valueOf(br.readLine()));
         System.out.print("이메일을 입력하세요 : ");
-        user.setName(br.readLine());
+        user.setEmail(br.readLine());
         System.out.print("전화번호를 입력하세요 : ");
-        user.setName(br.readLine());
+        user.setTel(br.readLine());
         System.out.print("주소를 입력하세요: ");
         user.setAddress(br.readLine());
         //어차피 번지 이거 2차때 api쓸때나 필요함...
@@ -192,20 +192,32 @@ public class PrintServiceImpl {
 //        System.out.print("관리할 창고ID를 입력하세요 : ");
 //        data.setWarehouseID(Integer.parseInt(br.readLine()));
     }
-
-    public PrintFunctionName printFindID(String email,BufferedReader br) throws IOException{
+    public PrintFunctionName printFindID(InputVO data,BufferedReader br) throws IOException{
         PrintFunctionName funName = null;
         System.out.println("이메일 주소를 입력해주세요.");
-        email = br.readLine();
-        return funName = PrintFunctionName.PRINT_START_MENU;
+        data.getUser().setEmail(br.readLine());
+        return funName = PrintFunctionName.EXIT;
     }
-    public PrintFunctionName printFindPW(String userId, BufferedReader br) throws IOException{
+    public void printFindIDResult(String result) {
+        if (result.equals("")) {
+            System.out.println("해당 이메일로 가입된 아이디가 없습니다.");
+        } else {
+            System.out.println("찾으시는 아이디는 " + result + " 입니다.");
+        }
+    }
+    public PrintFunctionName printFindPW(InputVO data, BufferedReader br) throws IOException{
         PrintFunctionName funName = null;
         System.out.println("아이디를 입력해주세요.");
-        userId = br.readLine();
-        return funName = PrintFunctionName.PRINT_START_MENU;
+        data.getUser().setUserId(br.readLine());
+        return funName = PrintFunctionName.EXIT;
     }
-
+    public void printFindPWResult(String result) {
+        if (result.equals("")) {
+            System.out.println("해당 아이디로 가입된 정보가 없습니다.");
+        } else {
+            System.out.println("찾으시는 아이디의 비밀번호는 " + result + " 입니다.");
+        }
+    }
     public PrintFunctionName PrintMainMenu(BufferedReader br)throws IOException{
         PrintFunctionName funName = null;
         System.out.flush();
@@ -243,8 +255,6 @@ public class PrintServiceImpl {
     public PrintFunctionName printMembershipManagementForAdmin(BufferedReader br)
             throws IOException {
         PrintFunctionName funName = null;
-        System.out.flush();
-        this.printLogo();
         System.out.println(
                 "1. 회원 조회 \n" +
                         "2. 승인 대기 조회 \n" +
@@ -265,8 +275,6 @@ public class PrintServiceImpl {
 
     public PrintFunctionName printSelectMemberMenu(BufferedReader br) throws IOException {
         PrintFunctionName funName = null;
-        System.out.flush();
-        this.printLogo();
         System.out.println(
                 "1. 전체 회원 조회 \n" +
                         "2. ID로 회원 조회 \n" +
@@ -276,8 +284,8 @@ public class PrintServiceImpl {
             int sel = this.printAskNumber(br, "메뉴를 입력하세요 :", 4);
             switch (sel) {
                 case 1 -> funName = PrintFunctionName.PRINT_MEMBER_LIST;
-                case 2 -> funName = PrintFunctionName.PRINT_MEMBER_BY_ID;
-                case 3 -> funName = PrintFunctionName.PRINT_MEMBER_BY_BUSINESS_NUMBER;
+                case 2 -> funName = PrintFunctionName.PRINT_REQUEST_INPUT_ID;
+                case 3 -> funName = PrintFunctionName.PRINT_REQUEST_INPUT_BUSINESS_NUMBER;
                 case 4 -> funName = PrintFunctionName.EXIT;
             }
         } catch (WrongInputNumberException e) {
@@ -287,7 +295,7 @@ public class PrintServiceImpl {
         return funName;
     }
 
-    public PrintFunctionName printMemberList(ArrayList<UserVO> userList, String whatList) {
+    public PrintFunctionName printMemberList(ArrayList<UserVO> userList, String whatList, BufferedReader br) throws IOException{
         PrintFunctionName funName = null;
         System.out.flush();
         this.printLogo();
@@ -303,10 +311,22 @@ public class PrintServiceImpl {
         }
 
         if (whatList.equals("waitingMemberList")){
-            return funName = PrintFunctionName.PRINT_APPROVE_REGISTRATION_REQUEST;
+            System.out.println("1. 승인 처리\n"
+                + "2. 돌아가기");
+            try {
+                int sel = this.printAskNumber(br, "메뉴를 입력하세요 :", 2);
+                switch (sel) {
+                    case 1 -> funName = PrintFunctionName.PRINT_APPROVE_REGISTRATION_REQUEST;
+                    case 2 -> funName = PrintFunctionName.EXIT;
+                }
+            } catch (WrongInputNumberException e) {
+                System.err.println(e.getMessage());
+                funName = PrintFunctionName.PRINT_WAITING_MEMBER_LIST;
+            }
         } else {
-            return funName = PrintFunctionName.EXIT;
+            funName = PrintFunctionName.EXIT;
         }
+        return funName;
     }
 
     public PrintFunctionName printApproveRegistrationRequest(InputVO data, BufferedReader br) throws IOException{
@@ -327,8 +347,6 @@ public class PrintServiceImpl {
 
     public PrintFunctionName printRequestInputId(InputVO data, BufferedReader br) throws IOException {
         PrintFunctionName funName = null;
-        System.out.flush();
-        this.printLogo();
 
         System.out.println("조회하려는 회원의 아이디를 입력해주세요.");
         data.getUser().setUserId(br.readLine());
@@ -338,8 +356,6 @@ public class PrintServiceImpl {
 
     public PrintFunctionName printMemberById(UserVO user) {
         PrintFunctionName funName = null;
-        System.out.flush();
-        this.printLogo();
 
         System.out.println("이름: " + user.getName());
         System.out.println("생년월일: " + user.getBirth());
@@ -354,8 +370,6 @@ public class PrintServiceImpl {
 
     public PrintFunctionName printRequestInputBusinessNumber(InputVO data, BufferedReader br) throws IOException {
         PrintFunctionName funName = null;
-        System.out.flush();
-        this.printLogo();
 
         System.out.println("조회하려는 회원의 사업자 번호를 입력해주세요.");
         data.getUser().setBusinessNumber(br.readLine());
@@ -365,8 +379,6 @@ public class PrintServiceImpl {
 
     public PrintFunctionName printMemberByBusinessNumber(UserVO user) {
         PrintFunctionName funName = null;
-        System.out.flush();
-        this.printLogo();
 
         System.out.println("이름: " + user.getName());
         System.out.println("생년월일: " + user.getBirth());
@@ -382,8 +394,6 @@ public class PrintServiceImpl {
     public PrintFunctionName printMembershipManagementForMember(BufferedReader br)
             throws IOException {
         PrintFunctionName funName = null;
-        System.out.flush();
-        this.printLogo();
         System.out.println(
                 "1. 내정보 보기\n"
                         + "2. 내정보 수정\n"
@@ -411,8 +421,6 @@ public class PrintServiceImpl {
             throws IOException {
         PrintFunctionName funName = null;
         UserVO user = data.getUser();
-        System.out.flush();
-        this.printLogo();
         System.out.println("이름: " + user.getName());
         System.out.println("생년월일: " + user.getBirth());
         System.out.println("이메일: " + user.getEmail());
@@ -426,8 +434,6 @@ public class PrintServiceImpl {
     public PrintFunctionName printUpdateMemberDetails(InputVO data, BufferedReader br)
             throws IOException {
         PrintFunctionName funName = null;
-        System.out.flush();
-        this.printLogo();
         UserVO user = data.getUser();
 //    try {
         System.out.println("사용자(" + user.getUserId() + ")에 대한 변경 사항들을 입력해주십시오.");
@@ -456,8 +462,6 @@ public class PrintServiceImpl {
     public PrintFunctionName printUpdateMemberPassword(String pwd, InputVO data, BufferedReader br)
             throws IOException {
         PrintFunctionName funName = null;
-        System.out.flush();
-        this.printLogo();
 
         System.out.println("현재 비밀번호를 입력하세요");
         String currentPwd = br.readLine();
@@ -476,7 +480,7 @@ public class PrintServiceImpl {
             System.out.println("비밀번호 변경에 실패하였습니다.");
         }
 
-        funName = PrintFunctionName.PRINT_CHANGE_PASSWORD_RESULT;
+        funName = PrintFunctionName.EXIT;
 
         return funName;
     }
@@ -484,8 +488,6 @@ public class PrintServiceImpl {
     public PrintFunctionName printCancelAccount(MainVO data, InputVO temp, BufferedReader br)
             throws IOException {
         PrintFunctionName funName = null;
-        System.out.flush();
-        this.printLogo();
         System.out.println("비밀번호를 입력하세요");
         String pwd = br.readLine();
 
@@ -502,8 +504,6 @@ public class PrintServiceImpl {
 
     public PrintFunctionName printMembershipManagementForGuest() throws IOException {
         PrintFunctionName funName = null;
-        System.out.flush();
-        this.printLogo();
         System.out.println("비회원은 사용할 수 없는 기능입니다.");
         funName = PrintFunctionName.EXIT;
         return funName;
@@ -517,29 +517,15 @@ public class PrintServiceImpl {
         System.out.flush();
         this.printLogo();
         System.out.println(
-                "1. 상품등록\n"+
+            "1. 상품등록\n"+
                 "2. 상품조회\n"+
                 "3. 뒤로가기\n");
         try{
             int sel = this.printAskNumber(br,"메뉴를 선택하세요 ",3);
             switch (sel){
-                case 1 :
-                    System.out.println("[상품등록]");
-                    System.out.print("상품명 : ");
-                    productVO.setProductName(br.readLine());
-                    System.out.println("상품브랜드 : ");
-                    productVO.setProductBrand(br.readLine());
-                    System.out.println("상품 면적 : ");
-                    productVO.setAreaPerProduct(Integer.parseInt(br.readLine()));
-                    System.out.println("카테고리 ID : ");
-                    productVO.setCategoryId(Integer.parseInt(br.readLine()));
-                    break;
-                case 2:
-                    System.out.println("[상품조회]");
-                    System.out.println("상품ID|상품명|브랜드|상품면적|상품카테고리");
-
-                    break;
-                case 3:funName = PrintFunctionName.EXIT;break;
+                case 1-> funName = PrintFunctionName.PRINT_INSERT_PRODUCT;
+                case 2-> funName = PrintFunctionName.PRINT_INQUIRY_PRODUCTS;
+                case 3-> funName = PrintFunctionName.EXIT;
             }
         }catch (WrongInputNumberException e){
             System.err.println(e.getMessage());
@@ -547,17 +533,30 @@ public class PrintServiceImpl {
         }
         return funName;
     }
+    public PrintFunctionName printInsertProduct(InputVO inputData,BufferedReader br)throws IOException{
+        ProductVO productVO = inputData.getProduct();
+        System.out.println("[상품등록]");
+        System.out.print("상품명 : ");
+        productVO.setProductName(br.readLine());
+        System.out.println("상품브랜드 : ");
+        productVO.setProductBrand(br.readLine());
+        System.out.println("상품 면적 : ");
+        productVO.setAreaPerProduct(Integer.parseInt(br.readLine()));
+        System.out.println("카테고리 ID : ");
+        productVO.setCategoryId(Integer.parseInt(br.readLine()));
+        return PrintFunctionName.EXIT;
+    }
     public PrintFunctionName printInquiryProducts(ArrayList<ProductVO> ret,BufferedReader br)throws IOException{
         PrintFunctionName funName = null;
         System.out.println("[상품조회]");
         System.out.println("상품ID|상품명|브랜드|상품면적|상품카테고리");
         for(ProductVO vo:ret){
             System.out.println(
-                            vo.getProductId()+"|"+
-                            vo.getProductName()+"|"+
-                            vo.getProductBrand()+"|"+
-                            vo.getAreaPerProduct()+"|"+
-                            vo.getCategoryId()+"|"
+                vo.getProductId()+"|"+
+                    vo.getProductName()+"|"+
+                    vo.getProductBrand()+"|"+
+                    vo.getAreaPerProduct()+"|"+
+                    vo.getCategoryId()+"|"
             );
         }
         System.out.println("\n1. 수정  2. 삭제  3. 뒤로가기");
@@ -611,24 +610,24 @@ public class PrintServiceImpl {
             switch (r) {
                 case ADMIN:
                     System.out.println(
-                            "1. 창고 등록\n" +
+                        "1. 창고 등록\n" +
                             "2. 전체 창고 조회\n"+
-                            "3. 소재지별 창고 조회\n" +
-                            "4. 창고명별 창고 조희\n" +
-                            "5. 돌아가기"
+                        /*"3. 소재지별 창고 조회\n" +
+                        "4. 창고명별 창고 조희\n" +*/
+                            "3. 돌아가기"
                     );
-                    sel = this.printAskNumber(br, "메뉴를 선택하세요 : ", 5);
+                    sel = this.printAskNumber(br, "메뉴를 선택하세요 : ", 3);
                     switch (sel){
                         case 1->funName = PrintFunctionName.PRINT_INSERT_WH;
                         case 2->funName = PrintFunctionName.PRINT_INQUIRY_WH;
-                        case 3->funName = PrintFunctionName.PRINT_INQUIRY_WH_BY_LOCATION;
-                        case 4->funName = PrintFunctionName.PRINT_INQUIRY_WH_BY_NAME;
-                        case 5->funName = PrintFunctionName.EXIT;
+                    /*case 3->funName = PrintFunctionName.PRINT_INQUIRY_WH_BY_LOCATION;
+                    case 4->funName = PrintFunctionName.PRINT_INQUIRY_WH_BY_NAME;*/
+                        case 3->funName = PrintFunctionName.EXIT;
                     }
                     break;
                 case WH_MANAGER:
                     System.out.println(
-                            "1. 창고조희" +
+                        "1. 창고조희" +
                             "2. 돌아가기"
                     );
                     sel = this.printAskNumber(br, "메뉴를 선택하세요 : ", 2);
@@ -651,7 +650,7 @@ public class PrintServiceImpl {
         System.out.println("창고id | 창고 이름 | 창고 주소 | 창고 면적 | 관리자 ID");
         for(WarehouseVO vo:arr){
             System.out.println(
-                    vo.getStorageId()+" | "+
+                vo.getStorageId()+" | "+
                     vo.getStorageName()+" | "+
                     vo.getAddress()+" | "+
                     vo.getStorageArea()+" | "+
@@ -684,13 +683,13 @@ public class PrintServiceImpl {
         System.out.println("[창고 조회]");
         System.out.println("창고id | 창고 이름 | 창고 주소 | 창고 면적 | 관리자 ID");
         for(WarehouseVO vo :arr){
-        System.out.println(
+            System.out.println(
                 vo.getStorageId()+" | "+
-                        vo.getStorageName()+" | "+
-                        vo.getAddress()+" | "+
-                        vo.getStorageArea()+" | "+
-                        vo.getManagerId()+" | "
-        );
+                    vo.getStorageName()+" | "+
+                    vo.getAddress()+" | "+
+                    vo.getStorageArea()+" | "+
+                    vo.getManagerId()+" | "
+            );
         }
         System.out.print("아무키나 입력하면 돌아갑니다. ");
         br.readLine();
@@ -712,12 +711,15 @@ public class PrintServiceImpl {
         System.out.println("[창고 등록]");
         System.out.print("창고 명 : ");
         warehouse.setStorageName(br.readLine());
-        System.out.print("주소지 : ");
+        System.out.print("주소 : ");
         warehouse.setAddress(br.readLine());
+        System.out.print("상세 주소 : ");
+        warehouse.setAddressDetail(br.readLine());
         System.out.print("창고 면적 : ");
         warehouse.setStorageArea(Integer.parseInt(br.readLine()));
         System.out.print("관리자 ID : ");
         warehouse.setManagerId(br.readLine());
+        warehouse.setZipCode(100);//임시
         return PrintFunctionName.EXIT;
     }
     //////////////////////////////////////////////////////재무관리

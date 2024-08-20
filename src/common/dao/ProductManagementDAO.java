@@ -30,7 +30,7 @@ public class ProductManagementDAO {
 
             while(rs.next()){
                 ProductVO vo = new ProductVO(rs.getInt("product_id"),rs.getString("product_brand"),
-                        rs.getString("product_name"),rs.getInt("area_per_product"),rs.getInt("small_category_id"));
+                    rs.getString("product_name"),rs.getInt("area_per_product"),rs.getInt("small_category_id"));
                 ret.add(vo);
             }
 
@@ -55,7 +55,7 @@ public class ProductManagementDAO {
 
             while(rs.next()){
                 ProductVO vo = new ProductVO(rs.getInt("product_id"),rs.getString("product_brand"),
-                        rs.getString("product_name"),rs.getInt("area_per_product"),rs.getInt("small_category_id"));
+                    rs.getString("product_name"),rs.getInt("area_per_product"),rs.getInt("small_category_id"));
                 ret.add(vo);
             }
 
@@ -69,17 +69,16 @@ public class ProductManagementDAO {
         return ret;
     }
     public void insertProduct(ProductVO data){
-        String query = "insert into product(product_id,product_brand,product_name,area_per_product,small_category_id)"+
-                "values(?,?,?,?,?)";
+        String query = "insert into product(product_brand,product_name,area_per_product,small_category_id)"+
+            "values(?,?,?,?)";
         this.connection = conncp.getConnection(100);
 
         try{
             PreparedStatement pstmt = connection.prepareStatement(query);
-            pstmt.setInt(1,data.getProductId());
-            pstmt.setString(2,data.getProductBrand());
-            pstmt.setString(3,data.getProductName());
-            pstmt.setInt(4,data.getAreaPerProduct());
-            pstmt.setInt(5,data.getCategoryId());
+            pstmt.setString(1,data.getProductBrand());
+            pstmt.setString(2,data.getProductName());
+            pstmt.setInt(3,data.getAreaPerProduct());
+            pstmt.setInt(4,data.getCategoryId());
 
             pstmt.executeUpdate();
             pstmt.close();
@@ -92,11 +91,11 @@ public class ProductManagementDAO {
     }
     public void updateProduct(ProductVO data){
         String query = "update product set "
-                + "product_brand = ?, "
-                + "product_name = ?, "
-                + "area_per_product = ?, "
-                + "small_category_id = ? "
-                + "where product_id = ?";
+            + "product_brand = ?, "
+            + "product_name = ?, "
+            + "area_per_product = ?, "
+            + "small_category_id = ? "
+            + "where product_id = ?";
         connection = conncp.getConnection(100);
         try{
             PreparedStatement pstmt = connection.prepareStatement(query);

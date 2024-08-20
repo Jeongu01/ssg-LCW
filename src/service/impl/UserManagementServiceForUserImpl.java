@@ -29,8 +29,12 @@ public class UserManagementServiceForUserImpl implements UserManagementServiceFo
    * */
   @Override
   public UserVO updateUserDetails(UserVO userVO, UserVO updatedUserVO) throws IOException {
+    updatedUserVO.setUserId(userVO.getUserId());
+    updatedUserVO.setPassword(userVO.getPassword());
+    updatedUserVO.setRole(userVO.getRole());
+    updatedUserVO.setStatus(userVO.getStatus());
     if (dao.updateUser(updatedUserVO)) {
-      userVO = updatedUserVO;
+      return updatedUserVO;
     }
     return userVO;
   }
@@ -52,13 +56,6 @@ public class UserManagementServiceForUserImpl implements UserManagementServiceFo
    * */
   @Override
   public boolean cancelAccount(UserVO userVO) throws IOException {
-    System.out.println("비밀번호를 입력하세요");
-    String pwd = br.readLine();
-
-    if (pwd.equals(userVO.getPassword())) {
-      return dao.deleteUser(userVO.getUserId());
-    }
-
-    return false;
+    return dao.deleteUser(userVO.getUserId());
   }
 }

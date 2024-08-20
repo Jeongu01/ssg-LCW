@@ -30,8 +30,8 @@ public class WarehouseManagementDAO {
             rs = pstmt.executeQuery();
             while(rs.next()){
                 WarehouseVO vo = new WarehouseVO(rs.getInt("storage_id"),rs.getString("storage_name"),
-                        rs.getString("address"),rs.getString("address_detail"),rs.getInt("zipcode"),
-                        rs.getInt("storage_area"),rs.getString("manager_id"));
+                    rs.getString("address"),rs.getString("address_detail"),rs.getInt("zipcode"),
+                    rs.getInt("storage_area"),rs.getString("manager_id"));
                 ret.add(vo);
             }
             rs.close();
@@ -56,8 +56,8 @@ public class WarehouseManagementDAO {
             rs = pstmt.executeQuery();
             while(rs.next()){
                 WarehouseVO vo = new WarehouseVO(rs.getInt("storage_id"),rs.getString("storage_name"),
-                        rs.getString("address"),rs.getString("address_detail"),rs.getInt("zipcode"),
-                        rs.getInt("storage_area"),rs.getString("manager_id"));
+                    rs.getString("address"),rs.getString("address_detail"),rs.getInt("zipcode"),
+                    rs.getInt("storage_area"),rs.getString("manager_id"));
                 ret.add(vo);
             }
             rs.close();
@@ -82,8 +82,8 @@ public class WarehouseManagementDAO {
             rs = pstmt.executeQuery();
             while(rs.next()){
                 WarehouseVO vo = new WarehouseVO(rs.getInt("storage_id"),rs.getString("storage_name"),
-                        rs.getString("address"),rs.getString("address_detail"),rs.getInt("zipcode"),
-                        rs.getInt("storage_area"),rs.getString("manager_id"));
+                    rs.getString("address"),rs.getString("address_detail"),rs.getInt("zipcode"),
+                    rs.getInt("storage_area"),rs.getString("manager_id"));
                 ret.add(vo);
             }
             rs.close();
@@ -108,8 +108,8 @@ public class WarehouseManagementDAO {
             rs = pstmt.executeQuery();
             while(rs.next()){
                 WarehouseVO vo = new WarehouseVO(rs.getInt("storage_id"),rs.getString("storage_name"),
-                        rs.getString("address"),rs.getString("address_detail"),rs.getInt("zipcode"),
-                        rs.getInt("storage_area"),rs.getString("manager_id"));
+                    rs.getString("address"),rs.getString("address_detail"),rs.getInt("zipcode"),
+                    rs.getInt("storage_area"),rs.getString("manager_id"));
                 ret.add(vo);
             }
             rs.close();
@@ -124,19 +124,18 @@ public class WarehouseManagementDAO {
         return ret;
     }
     public void insertWarehouse(WarehouseVO data){
-        String query = "insert into storage(storage_id,storage_name,address,address_detail,zipcode,storage_area,manager_id)"+
-                "values(?,?,?,?,?,?,?)";
+        String query = "insert into storage(storage_name,address,address_detail,zipcode,storage_area,manager_id)"+
+            "values(?,?,?,?,?,?)";
         this.connection = conncp.getConnection(100);
 
         try{
             PreparedStatement pstmt = connection.prepareStatement(query);
-            pstmt.setInt(1,data.getStorageId());
-            pstmt.setString(2,data.getStorageName());
-            pstmt.setString(3,data.getAddress());
-            pstmt.setString(4, data.getAddressDetail());
-            pstmt.setInt(5,data.getZipCode());
-            pstmt.setInt(6,data.getStorageArea());
-            pstmt.setString(7, data.getManagerId());
+            pstmt.setString(1,data.getStorageName());
+            pstmt.setString(2,data.getAddress());
+            pstmt.setString(3, data.getAddressDetail());
+            pstmt.setInt(4,data.getZipCode());
+            pstmt.setInt(5,data.getStorageArea());
+            pstmt.setString(6, data.getManagerId());
 
             pstmt.executeUpdate();
             pstmt.close();
